@@ -78,7 +78,6 @@ public abstract class MixinInventoryPlayer {
     @Unique
     private String getTotalWorldTimeString() {
         long totalWorldTimeTicks = this.player.worldObj.getTotalWorldTime();
-        System.out.println(totalWorldTimeTicks);
 
         String totalWorldTime;
         if (totalWorldTimeTicks < TICKS_IN_MINUTES) {
