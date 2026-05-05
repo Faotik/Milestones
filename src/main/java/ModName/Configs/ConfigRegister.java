@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigException;
 public class ConfigRegister {
 
     public static void init() {
-
+        register(ConfigMilestones.class);
     }
 
     private static void register(Class<?> configClass) {

@@ -12,10 +12,10 @@ public enum Mixins implements IMixins {
     // "Test")
     // .setPhase(Phase.LATE)),
 
-//    MINECRAFT_EARLY(new MixinBuilder("Minecraft Early")
-//        .addClientMixins(
-//            "Test")
-//        .setPhase(Phase.EARLY));
+    MINECRAFT_EARLY(new MixinBuilder("Minecraft Early")
+        .addClientMixins(
+            "MixinInventoryPlayer")
+        .setPhase(Phase.EARLY));
     ;
 
 
