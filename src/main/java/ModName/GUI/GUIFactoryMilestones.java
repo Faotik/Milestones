@@ -60,10 +60,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
             Item item = GameRegistry.findItem(modid, name);
             ItemStack stack = new ItemStack(item, 1, meta);
-            var new
-                panel.child(
-                new Scrol
-            )
+            
             panel.child(
                 new ItemDisplayWidget()
                     .item(stack)
