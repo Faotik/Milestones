@@ -2,6 +2,7 @@ package ModName.GUI;
 
 import ModName.Configs.ConfigMilestones;
 import ModName.ModName;
+import ModName.UI.HorizontalHiddenScrollData;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
@@ -13,11 +14,15 @@ import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.EmptyWidget;
+import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
+import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
+import com.cleanroommc.modularui.widgets.layout.Grid;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -55,10 +60,11 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         final int sectionTitleOffsetX = 0;
         final int sectionTitleOffsetY = 8;
         final int tabTitleOffsetY = 10;
-        final int tabOffsetX = 4;
-        final int tabOffsetY = -21;
+        final int tabOffsetX = 2;
+        final int tabOffsetY = -26;
         final int tabOffsetBetween = 8;
         final int tabSize = 22;
+        final int tabGridHeight = 27;
         final int tabIconSize = 18;
         final int tabPadding = (22 - tabIconSize) / 2;
         final int milestoneWidth = columnWidth - 10;
@@ -72,10 +78,21 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         ModularPanel panel = new ModularPanel("milestonesgui")
             .size(panelWidth, panelHeight);
 
-        List<String> allMilestones = Arrays.asList(ConfigMilestones.milestones.items);
+        String[] allMilestones = ConfigMilestones.milestones.items;
 
-        List<ListWidget> tabPanels = new ArrayList<>();
-//        List<ButtonWidget> tabButtons = new ArrayList<>();
+        List<Widget<?>> tabPanels = new ArrayList<>();
+        List<Widget<?>> tabScrollbars = new ArrayList<>();
+
+        HorizontalScrollData scrollData = new HorizontalHiddenScrollData(true);
+        scrollData.texture(IDrawable.EMPTY);
+        scrollData.setScrollSize(2);
+
+        Grid tabGrid = new Grid()
+            .size(panelWidth - tabOffsetX * 2, tabGridHeight)
+            .pos(tabOffsetX, tabOffsetY)
+            .minColWidth(tabSize)
+            .minElementMargin(tabPadding)
+            .scrollable(scrollData);
 
         panel.child(
             ButtonWidget.panelCloseButton()
@@ -107,14 +124,13 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
                 int offsetX = tabIndex == 0 ? tabOffsetX : tabOffsetBetween;
                 final int finalTabIndex = tabIndex;
-                panel.child(
+
+                tabGrid.child(
                     new ButtonWidget<>()
-                        .pos(tabIndex * tabSize + offsetX, tabOffsetY)
                         .size(tabSize)
                         .padding(tabPadding)
                         .overlay(new ItemDrawable(stack))
                         .onMousePressed(mouseButton -> {
-                            System.out.println(finalTabIndex);
                             if (mouseButton == 0 || mouseButton == 1) {
                                 for (int i = 0; i < tabPanels.size(); i++) {
                                     tabPanels.get(i).setEnabled(i == finalTabIndex);
@@ -124,6 +140,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                             return false;
                         })
                 );
+
                 tabIndex++;
 
                 tab.child(
@@ -185,6 +202,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         tabPanels.add(tab);
         panel.child(tab);
         tabPanels.get(0).setEnabled(true);
+
+        panel.child(tabGrid);
 
         return panel;
     }
