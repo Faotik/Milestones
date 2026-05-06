@@ -1,5 +1,7 @@
 package ModName;
 
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,11 +20,15 @@ public class ModName {
     public static final String MODNAME = "ModName";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
+    public static SimpleNetworkWrapper network;
+
     @SidedProxy(clientSide = "ModName.ClientProxy", serverSide = "ModName.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        this.network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+
         proxy.preInit(event);
     }
 
