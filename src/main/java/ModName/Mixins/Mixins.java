@@ -13,7 +13,7 @@ public enum Mixins implements IMixins {
     // .setPhase(Phase.LATE)),
 
     MINECRAFT_EARLY(new MixinBuilder("Minecraft Early")
-        .addClientMixins(
+        .addServerMixins(
             "MixinInventoryPlayer")
         .setPhase(Phase.EARLY));
     ;

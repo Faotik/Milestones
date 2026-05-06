@@ -5,6 +5,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatList;
@@ -72,8 +73,8 @@ public abstract class MixinInventoryPlayer {
                     milestones.setLong(itemIdAndMeta, timeTicks);
 
                     this.player.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.GRAY + "[New milestone completed] - " +
-                            EnumChatFormatting.GREEN + itemIdAndMeta + " : " + totalWorldTimeString
+                        EnumChatFormatting.GRAY + "[New milestone completed!]: " +
+                            EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
                     ));
                 }
             }

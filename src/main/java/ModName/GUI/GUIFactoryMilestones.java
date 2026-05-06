@@ -68,7 +68,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         ModularPanel panel = new ModularPanel("milestonesgui")
             .size(panelWidth, panelHeight);
 
-        String[] allMilestones = ConfigMilestones.milestones.items;
+        String[] allMilestones = guiData.allMilestones;
 
         List<Widget<?>> tabPanels = new ArrayList<>();
         List<Widget<?>> tabButtons = new ArrayList<>();
@@ -239,6 +239,18 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        if (guiData.allMilestones == null) {
+            buffer.writeInt(0);
+        } else {
+            buffer.writeInt(guiData.allMilestones.length);
+            for (String s : guiData.allMilestones) {
+                try {
+                    buffer.writeStringToBuffer(s);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     @Override
@@ -249,6 +261,16 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        int length = buffer.readInt();
+        String[] milestones = new String[length];
+        for (int i = 0; i < length; i++) {
+            try {
+                milestones[i] = buffer.readStringFromBuffer(32767);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        data.allMilestones = milestones;
         return data;
     }
 }
