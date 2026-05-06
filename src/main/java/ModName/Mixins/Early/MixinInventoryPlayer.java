@@ -3,9 +3,11 @@ package ModName.Mixins.Early;
 import ModName.Configs.ConfigMilestones;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import org.spongepowered.asm.mixin.Mixin;
@@ -61,35 +63,37 @@ public abstract class MixinInventoryPlayer {
             System.out.println(milestones);
 
             if (!milestones.hasKey(itemIdAndMeta)) {
-                long totalWorldTime = this.player.worldObj.getTotalWorldTime();
-                String totalWorldTimeString = getTotalWorldTimeString();
+                if (player instanceof EntityPlayerMP) {
+                    EntityPlayerMP playerMP = (EntityPlayerMP) player;
 
-                milestones.setLong(itemIdAndMeta, totalWorldTime);
+                    long timeTicks = playerMP.func_147099_x().writeStat(StatList.minutesPlayedStat);
+                    String totalWorldTimeString = getTimeString(timeTicks);
 
-                this.player.addChatMessage(new ChatComponentText(
-                    EnumChatFormatting.GRAY + "[New milestone completed] - " +
-                        EnumChatFormatting.GREEN + itemIdAndMeta + " : " + totalWorldTimeString
-                ));
+                    milestones.setLong(itemIdAndMeta, timeTicks);
+
+                    this.player.addChatMessage(new ChatComponentText(
+                        EnumChatFormatting.GRAY + "[New milestone completed] - " +
+                            EnumChatFormatting.GREEN + itemIdAndMeta + " : " + totalWorldTimeString
+                    ));
+                }
             }
         }
 
     }
 
     @Unique
-    private String getTotalWorldTimeString() {
-        long totalWorldTimeTicks = this.player.worldObj.getTotalWorldTime();
-
-        String totalWorldTime;
-        if (totalWorldTimeTicks < TICKS_IN_MINUTES) {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_SECOND) + "s";
+    private String getTimeString(long timeTicks) {
+        String timeString;
+        if (timeTicks < TICKS_IN_MINUTES) {
+            timeString = (timeTicks / TICKS_IN_SECOND) + "s";
         }
-        else if (totalWorldTimeTicks < TICKS_IN_HOURS) {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
+        else if (timeTicks < TICKS_IN_HOURS) {
+            timeString = (timeTicks / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
         else {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_HOURS) + "h " + ((totalWorldTimeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
+            timeString = (timeTicks / TICKS_IN_HOURS) + "h " + ((timeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
-        return totalWorldTime;
+        return timeString;
     }
 
     @Unique

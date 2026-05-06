@@ -4,20 +4,14 @@ import ModName.Configs.ConfigMilestones;
 import ModName.ModName;
 import ModName.UI.HorizontalHiddenScrollData;
 import com.cleanroommc.modularui.api.UIFactory;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
-import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.widget.EmptyWidget;
-import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.Widget;
-import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
-import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
@@ -29,11 +23,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumChatFormatting;
-import org.spongepowered.asm.mixin.Unique;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
@@ -55,14 +47,12 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         final int columnCount = 4;
         final int columnWidth = (panelWidth - columnOffset * 2) / columnCount;
         final int rowHeight = 24;
-        final int textOffsetX = 21;
-        final int textOffsetY = 4;
+        final int textMarginLeft = 22;
         final int sectionTitleOffsetX = 0;
         final int sectionTitleOffsetY = 8;
         final int tabTitleOffsetY = 10;
         final int tabOffsetX = 2;
         final int tabOffsetY = -26;
-        final int tabOffsetBetween = 8;
         final int tabSize = 22;
         final int tabGridHeight = 27;
         final int tabIconSize = 18;
@@ -155,6 +145,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                     new TextWidget<>(title)
                         .posRel(Alignment.TopCenter)
                         .marginTop(tabTitleOffsetY)
+                        .scale(1.5f)
                 );
             } else if (milestone.charAt(0) == '^') {
                 columnIndex = 0;
@@ -180,7 +171,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
                 String timeText = "Incomplete";
                 if (guiData.completedMilestones != null && guiData.completedMilestones.hasKey(milestone)) {
-                    timeText = EnumChatFormatting.GREEN + getTotalWorldTimeString(guiData.completedMilestones.getLong(milestone));
+                    timeText = EnumChatFormatting.GREEN + getTimeString(guiData.completedMilestones.getLong(milestone));
                 }
 
                 tab.child(
@@ -196,7 +187,10 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                         )
                         .child(
                             new TextWidget<>(timeText)
-                                .pos(textOffsetX + milestonePadding, textOffsetY + milestonePadding)
+                                .textAlign(Alignment.CenterLeft)
+                                .full()
+                                .scale(0.7f)
+                                .marginLeft(textMarginLeft)
                         )
                 );
 
@@ -219,18 +213,18 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         return panel;
     }
 
-    private String getTotalWorldTimeString(long totalWorldTimeTicks) {
-        String totalWorldTime;
-        if (totalWorldTimeTicks < TICKS_IN_MINUTES) {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_SECOND) + "s";
+    private String getTimeString(long timeTicks) {
+        String timeString;
+        if (timeTicks < TICKS_IN_MINUTES) {
+            timeString = (timeTicks / TICKS_IN_SECOND) + "s";
         }
-        else if (totalWorldTimeTicks < TICKS_IN_HOURS) {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
+        else if (timeTicks < TICKS_IN_HOURS) {
+            timeString = (timeTicks / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
         else {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_HOURS) + "h " + ((totalWorldTimeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
+            timeString = (timeTicks / TICKS_IN_HOURS) + "h " + ((timeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
-        return totalWorldTime;
+        return timeString;
     }
 
     @Override
