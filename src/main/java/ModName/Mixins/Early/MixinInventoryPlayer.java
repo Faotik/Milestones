@@ -84,10 +84,10 @@ public abstract class MixinInventoryPlayer {
             totalWorldTime = (totalWorldTimeTicks / TICKS_IN_SECOND) + "s";
         }
         else if (totalWorldTimeTicks < TICKS_IN_HOURS) {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_MINUTES) + "m";
+            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
         else {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_HOURS) + "h";
+            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_HOURS) + "h " + ((totalWorldTimeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
         return totalWorldTime;
     }

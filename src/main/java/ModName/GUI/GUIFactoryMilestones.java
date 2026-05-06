@@ -81,18 +81,14 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         String[] allMilestones = ConfigMilestones.milestones.items;
 
         List<Widget<?>> tabPanels = new ArrayList<>();
-        List<Widget<?>> tabScrollbars = new ArrayList<>();
-
-        HorizontalScrollData scrollData = new HorizontalHiddenScrollData(true);
-        scrollData.texture(IDrawable.EMPTY);
-        scrollData.setScrollSize(2);
+        List<Widget<?>> tabButtons = new ArrayList<>();
 
         Grid tabGrid = new Grid()
             .size(panelWidth - tabOffsetX * 2, tabGridHeight)
             .pos(tabOffsetX, tabOffsetY)
             .minColWidth(tabSize)
             .minElementMargin(tabPadding)
-            .scrollable(scrollData);
+            .scrollable(new HorizontalHiddenScrollData(true));
 
         panel.child(
             ButtonWidget.panelCloseButton()
@@ -122,23 +118,35 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 Item item = GameRegistry.findItem(modid, name);
                 ItemStack stack = new ItemStack(item, 1, meta);
 
-                int offsetX = tabIndex == 0 ? tabOffsetX : tabOffsetBetween;
                 final int finalTabIndex = tabIndex;
 
-                tabGrid.child(
-                    new ButtonWidget<>()
-                        .size(tabSize)
-                        .padding(tabPadding)
-                        .overlay(new ItemDrawable(stack))
-                        .onMousePressed(mouseButton -> {
-                            if (mouseButton == 0 || mouseButton == 1) {
-                                for (int i = 0; i < tabPanels.size(); i++) {
-                                    tabPanels.get(i).setEnabled(i == finalTabIndex);
+                Widget<?> button = new ButtonWidget<>()
+                    .size(tabSize)
+                    .padding(tabPadding)
+                    .overlay(new ItemDrawable(stack))
+                    .addTooltipLine(title)
+                    .onMousePressed(mouseButton -> {
+                        if (mouseButton == 0 || mouseButton == 1) {
+                            for (int i = 0; i < tabPanels.size(); i++) {
+                                if (i == finalTabIndex){
+                                    tabPanels.get(i).setEnabled(true);
+                                    tabButtons.get(i).background(GuiTextures.BUTTON_CLEAN);
+                                    tabButtons.get(i).marginTop(2);
                                 }
-                                return true;
+                                else {
+                                    tabPanels.get(i).setEnabled(false);
+                                    tabButtons.get(i).background(GuiTextures.MC_BUTTON);
+                                    tabButtons.get(i).marginTop(0);
+                                }
                             }
-                            return false;
-                        })
+                            return true;
+                        }
+                        return false;
+                    });
+
+                tabButtons.add(button);
+                tabGrid.child(
+                    button
                 );
 
                 tabIndex++;
@@ -184,6 +192,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                             new ItemDisplayWidget()
                                 .item(stack)
                                 .pos(milestonePadding, milestonePadding)
+                                .addTooltipLine(stack.getDisplayName())
                         )
                         .child(
                             new TextWidget<>(timeText)
@@ -202,6 +211,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         tabPanels.add(tab);
         panel.child(tab);
         tabPanels.get(0).setEnabled(true);
+        tabButtons.get(0).background(GuiTextures.BUTTON_CLEAN);
+        tabButtons.get(0).marginTop(2);
 
         panel.child(tabGrid);
 
@@ -214,10 +225,10 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
             totalWorldTime = (totalWorldTimeTicks / TICKS_IN_SECOND) + "s";
         }
         else if (totalWorldTimeTicks < TICKS_IN_HOURS) {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_MINUTES) + "m";
+            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
         else {
-            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_HOURS) + "h";
+            totalWorldTime = (totalWorldTimeTicks / TICKS_IN_HOURS) + "h " + ((totalWorldTimeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((totalWorldTimeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
         }
         return totalWorldTime;
     }
