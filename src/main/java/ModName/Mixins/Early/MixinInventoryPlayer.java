@@ -3,15 +3,20 @@ package ModName.Mixins.Early;
 import ModName.Configs.ConfigMilestones;
 import ModName.ModName;
 import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -78,16 +83,11 @@ public abstract class MixinInventoryPlayer {
                             EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
                     ));
 
-                    ItemStack trophyItemStack = new ItemStack(ModName.trophyBlock, 1);
-                    trophyItemStack.setTagCompound(new NBTTagCompound());
-                    NBTTagCompound nbt = trophyItemStack.getTagCompound();
-                    nbt.setString("trophyitem", itemIdAndMeta);
-
-                    player.dropPlayerItemWithRandomChoice(trophyItemStack, false);
+                    spawnTrophy(itemIdAndMeta);
+                    spawnFirework();
                 }
             }
         }
-
     }
 
     @Unique
@@ -118,5 +118,45 @@ public abstract class MixinInventoryPlayer {
             persistedData.setTag("CompletedMilestones", new NBTTagCompound());
         }
         return persistedData.getCompoundTag("CompletedMilestones");
+    }
+
+    @Unique
+    private void spawnTrophy(String itemIdAndMeta) {
+        ItemStack trophyItemStack = new ItemStack(ModName.trophyBlock, 1);
+        trophyItemStack.setTagCompound(new NBTTagCompound());
+        NBTTagCompound nbt = trophyItemStack.getTagCompound();
+        nbt.setString("trophyitem", itemIdAndMeta);
+
+        EntityItem trophyEntity = new EntityItem(player.worldObj, player.posX, player.posY, player.posZ, trophyItemStack);
+        player.worldObj.spawnEntityInWorld(trophyEntity);
+    }
+
+
+    @Unique
+    private void spawnFirework() {
+        ItemStack fireworkItemStack = new ItemStack(Items.fireworks);
+
+        NBTTagCompound baseTag = new NBTTagCompound();
+        NBTTagCompound fireworksTag = new NBTTagCompound();
+        NBTTagList explosionsList = new NBTTagList();
+        NBTTagCompound explosionTag = new NBTTagCompound();
+
+        explosionTag.setByte("Type", (byte) 1);
+        explosionTag.setByte("Flicker", (byte) 1);
+        explosionTag.setByte("Trail", (byte) 0);
+        int[] colors = new int[] { 0xFF0000, 0x00FF00, 0x0000FF };
+        explosionTag.setIntArray("Colors", colors);
+        int[] fadeColors = new int[] { 0xFFFFFF };
+        explosionTag.setIntArray("FadeColors", fadeColors);
+
+        explosionsList.appendTag(explosionTag);
+        fireworksTag.setTag("Explosions", explosionsList);
+        fireworksTag.setByte("Flight", (byte) 0);
+
+        baseTag.setTag("Fireworks", fireworksTag);
+        fireworkItemStack.setTagCompound(baseTag);
+
+        EntityFireworkRocket rocket = new EntityFireworkRocket(player.worldObj, player.posX, player.posY, player.posZ, fireworkItemStack);
+        player.worldObj.spawnEntityInWorld(rocket);
     }
 }
