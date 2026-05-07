@@ -1,6 +1,7 @@
 package ModName.Mixins.Early;
 
 import ModName.Configs.ConfigMilestones;
+import ModName.ModName;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -76,6 +77,13 @@ public abstract class MixinInventoryPlayer {
                         EnumChatFormatting.GRAY + "[New milestone completed!]: " +
                             EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
                     ));
+
+                    ItemStack trophyItemStack = new ItemStack(ModName.trophyBlock, 1);
+                    trophyItemStack.setTagCompound(new NBTTagCompound());
+                    NBTTagCompound nbt = trophyItemStack.getTagCompound();
+                    nbt.setString("trophyitem", itemIdAndMeta);
+
+                    player.dropPlayerItemWithRandomChoice(trophyItemStack, false);
                 }
             }
         }

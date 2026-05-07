@@ -3,14 +3,29 @@ package ModName;
 import ModName.Configs.ConfigRegister;
 import ModName.Events.GuiScreenEventHandler;
 import ModName.GUI.GUIFactoryMilestones;
+import ModName.ItemRenderer.TrophyItemRenderer;
+import ModName.TESR.TrophyTESR;
+import ModName.TileEntity.TrophyTileEntity;
 import com.cleanroommc.modularui.factory.GuiManager;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import net.minecraft.item.Item;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy extends CommonProxy {
 
+    public void preInit(FMLPreInitializationEvent event) {
+        super.preInit(event);
+
+        ClientRegistry.bindTileEntitySpecialRenderer(TrophyTileEntity.class, new TrophyTESR());
+    }
+
     public void init(FMLInitializationEvent event) {
-        ConfigRegister.init();
+        super.init(event);
+
+        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModName.trophyBlock), new TrophyItemRenderer());
         GuiManager.registerFactory(new GUIFactoryMilestones());
         MinecraftForge.EVENT_BUS.register(new GuiScreenEventHandler());
     }
