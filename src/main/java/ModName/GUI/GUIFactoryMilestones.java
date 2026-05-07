@@ -1,6 +1,5 @@
     package ModName.GUI;
 
-    import ModName.Configs.ConfigMilestones;
     import ModName.ModName;
     import ModName.UI.HorizontalHiddenScrollData;
     import com.cleanroommc.modularui.api.UIFactory;
@@ -40,7 +39,7 @@
         final int rowOffset = 10;
         final int columnCount = 4;
         final int columnWidth = (panelWidth - columnOffset * 2) / columnCount;
-        final int rowHeight = 24;
+        final int titleHeight = 28;
         final int textMarginLeft = 22;
         final int sectionTitleOffsetX = 0;
         final int sectionTitleOffsetY = 8;
@@ -51,9 +50,10 @@
         final int tabGridHeight = 27;
         final int tabIconSize = 18;
         final int tabPadding = (22 - tabIconSize) / 2;
-        final int milestoneWidth = columnWidth - 10;
+        final int milestoneWidth = columnWidth - 16;
         final int milestoneHeight = 22;
         final int milestonePadding = 2;
+        final int milestoneGap = 10;
 
         @Override
         public String getFactoryName() {
@@ -63,7 +63,6 @@
         @Override
         public ModularPanel createPanel(GUIDataMilestones guiData, PanelSyncManager syncManager, UISettings settings) {
             int columnIndex = 0;
-            int rowIndex = 0;
             int tabIndex = 0;
 
             ModularPanel panel = new ModularPanel("milestonesgui")
@@ -99,7 +98,6 @@
                         tabPanels.add(tab);
                         panel.child(tab);
                         columnIndex = 0;
-                        rowIndex = 0;
                     }
                     tab = new ListWidget<>()
                         .size(panelWidth - 6, panelHeight - 6)
@@ -154,17 +152,14 @@
                         new TextWidget<>(title)
     //                        .posRel(Alignment.TopCenter)
     //                        .marginTop(tabTitleOffsetY)
-                            .height(rowHeight)
+                            .height(titleHeight)
                             .scale(1.5f)
                     );
                 } else if (milestone.charAt(0) == '^') {
                     columnIndex = 0;
-                    if(rowIndex != 0) {
-                        rowIndex++;
-                        if (!row.getChildren().isEmpty()) {
-                            tab.child(row);
-                            row = createRow();
-                        }
+                    if (!row.getChildren().isEmpty()) {
+                        tab.child(row);
+                        row = createRow();
                     }
 
                     tab.child(
@@ -176,8 +171,6 @@
                             .paddingBottom(6)
     //                        .pos(columnOffset + sectionTitleOffsetX, rowIndex * rowHeight + rowOffset + sectionTitleOffsetY)
                     );
-
-                    rowIndex++;
                 }
                 else {
                     String[] parts = milestone.split(":");
@@ -208,7 +201,7 @@
                                 new TextWidget<>(timeText)
                                     .textAlign(Alignment.CenterLeft)
                                     .full()
-                                    .scale(0.7f)
+                                    .scale(0.65f)
                                     .marginLeft(textMarginLeft)
                             )
                     );
@@ -220,7 +213,6 @@
                             tab.child(row);
                             row = createRow();
                         }
-                        rowIndex++;
                     }
                 }
             }
@@ -241,8 +233,8 @@
 
         private Grid createRow() {
              return new Grid()
-                .size((milestoneWidth + tabPadding * 2) * columnCount - tabPadding * 2, milestoneHeight + tabPadding * 2)
-                .minElementMargin(tabPadding);
+                .size((milestoneWidth + milestoneGap) * columnCount - milestoneGap, milestoneHeight + milestoneGap)
+                .minElementMargin(milestoneGap / 2);
         }
 
         private String getTimeString(long timeTicks) {
