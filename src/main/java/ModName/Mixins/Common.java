@@ -1,12 +1,14 @@
 package ModName.Mixins;
 
 import ModName.ModName;
+import ModName.SaveData.CompletedMilestonesCacheSaveData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -14,7 +16,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import serverutils.lib.data.ForgePlayer;
+import serverutils.lib.data.ForgeTeam;
+import serverutils.lib.data.ServerUtilitiesAPI;
+import serverutils.lib.data.Universe;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 public class Common {
@@ -22,37 +29,70 @@ public class Common {
     private static final long TICKS_IN_MINUTES = TICKS_IN_SECOND * 60;
     private static final long TICKS_IN_HOURS = TICKS_IN_MINUTES * 60;
 
-    public static void checkItem(EntityPlayer player, ItemStack stack){
-        if (stack == null || stack.getItem() == null || player.worldObj.isRemote) {
+    public static void checkItem(UUID uuid, ItemStack stack){
+        if (stack == null || stack.getItem() == null) {
             return;
         }
 
-        int meta = stack.getItemDamage();
-        String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
-        String itemIdAndMeta = meta == 0 ? id : id + ":" + meta;
+        String idAndMeta = getIdAndMeta(stack);
 
-        if (ModName.milestonesList.contains(itemIdAndMeta)){
-            NBTTagCompound completedMilestones = getNbtTagCompoundMilestones(player);
-
-            if (!completedMilestones.hasKey(itemIdAndMeta)) {
-                if (player instanceof EntityPlayerMP) {
-                    EntityPlayerMP playerMP = (EntityPlayerMP) player;
-
-                    long timeTicks = playerMP.func_147099_x().writeStat(StatList.minutesPlayedStat);
-                    String totalWorldTimeString = getTimeString(timeTicks);
-
-                    completedMilestones.setLong(itemIdAndMeta, timeTicks);
-
-                    player.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.GRAY + "[New milestone completed!]: " +
-                            EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
-                    ));
-
-                    spawnTrophy(player, itemIdAndMeta);
-                    spawnFirework(player);
+        if (ModName.milestonesList.contains(idAndMeta)){
+            ForgeTeam team = Universe.get().getTeam(ServerUtilitiesAPI.getTeam(uuid));
+            if (!team.getMembers().isEmpty()) {
+                for (ForgePlayer member : team.getMembers()) {
+                    EntityPlayerMP playerMP = member.isOnline() ? member.getPlayer() : null;
+                    completeMilestone(playerMP, uuid, idAndMeta);
                 }
             }
+            else {
+                EntityPlayerMP playerMP = getPlayerByUUID(uuid);
+                completeMilestone(playerMP, uuid, idAndMeta);
+            }
         }
+    }
+
+    public static void completeMilestone(EntityPlayerMP playerMP, UUID uuid, String id){
+        if (playerMP == null) {
+            if (ModName.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>()).add(id)) {
+                CompletedMilestonesCacheSaveData.get().markDirty();
+            }
+            return;
+        }
+
+        ItemStack stack = getItemStackFromId(id);
+
+        NBTTagCompound completedMilestones = getNbtTagCompoundMilestones(playerMP);
+
+        if (!completedMilestones.hasKey(id)) {
+            long timeTicks = playerMP.func_147099_x().writeStat(StatList.minutesPlayedStat);
+            String totalWorldTimeString = getTimeString(timeTicks);
+
+            completedMilestones.setLong(id, timeTicks);
+
+            playerMP.addChatMessage(new ChatComponentText(
+                EnumChatFormatting.GRAY + "[New milestone completed!]: " +
+                    EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
+            ));
+
+            spawnTrophy(playerMP, id);
+            spawnFirework(playerMP);
+        }
+    }
+
+    public static ItemStack getItemStackFromId(String id){
+        String[] parts = id.split(":");
+        String modid = parts[0];
+        String name = parts[1];
+        int meta = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
+
+        Item item = GameRegistry.findItem(modid, name);
+        return new ItemStack(item, 1, meta);
+    }
+
+    private static String getIdAndMeta(ItemStack stack){
+        int meta = stack.getItemDamage();
+        String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
+        return meta == 0 ? id : id + ":" + meta;
     }
 
     private static String getTimeString(long timeTicks) {

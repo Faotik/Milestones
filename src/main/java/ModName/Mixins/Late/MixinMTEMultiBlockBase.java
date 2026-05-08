@@ -22,32 +22,15 @@ import static ModName.Mixins.Common.getPlayerByUUID;
 
 @Mixin(MTEMultiBlockBase.class)
 public abstract class MixinMTEMultiBlockBase {
-    @Inject(method = "addItemOutputs", at = @At("HEAD"), remap = false)
+    @Inject(
+        method = "addItemOutputs",
+        at = @At("HEAD"),
+        remap = false
+    )
     public void addItemOutputs(ItemStack[] outputItems, CallbackInfoReturnable<Boolean> cir) {
         UUID uuid = ((MTEMultiBlockBase) (Object) this).getBaseMetaTileEntity().getOwnerUuid();
-        EntityPlayerMP player = getPlayerByUUID(uuid);
-
-        boolean needUpdate = false;
         for (ItemStack stack : outputItems) {
-            if (stack == null) {
-                continue;
-            }
-            int meta = stack.getItemDamage();
-            String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
-            String itemIdAndMeta = meta == 0 ? id : id + ":" + meta;
-            if (ModName.milestonesList.contains(itemIdAndMeta)) {
-                if (player != null) {
-                    Common.checkItem(player, stack);
-                } else {
-                    if (ModName.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>()).add(itemIdAndMeta)) {
-                        needUpdate = true;
-                    }
-                }
-            }
-        }
-
-        if (needUpdate) {
-            CompletedMilestonesCacheSaveData.get().markDirty();
+            Common.checkItem(uuid, stack);
         }
     }
 }

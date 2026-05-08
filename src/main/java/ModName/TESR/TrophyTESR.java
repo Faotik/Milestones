@@ -64,6 +64,8 @@ public class TrophyTESR extends TileEntitySpecialRenderer {
         this.entityItem.setEntityItemStack(stack);
 
         GL11.glPushMatrix();
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glEnable(GL11.GL_BLEND);
 
         float offsetY = (float) Math.sin((te.getWorldObj().getTotalWorldTime() + partialTicks) * 0.05f) * 0.1f;
         GL11.glTranslated(x + 0.5, y + 0.7 + offsetY, z + 0.5);
@@ -71,8 +73,12 @@ public class TrophyTESR extends TileEntitySpecialRenderer {
         float rotation = ((te.getWorldObj().getTotalWorldTime() + partialTicks) * 2.0f) % 360.0F;
         GL11.glRotatef(rotation, 0.0F, 1.0F, 0.0F);
 
+        RenderItem.renderInFrame = true;
         RenderManager.instance.renderEntityWithPosYaw(this.entityItem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+        RenderItem.renderInFrame = false;
 
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glPopMatrix();
     }
 }

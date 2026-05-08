@@ -5,6 +5,7 @@ import ModName.Models.TrophyModel;
 import ModName.TileEntity.TrophyTileEntity;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
@@ -77,6 +78,7 @@ public class TrophyItemRenderer implements IItemRenderer {
         this.entityItem.setEntityItemStack(renderStack);
 
         GL11.glPushMatrix();
+        GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND);
 
         float offsetY = (float) Math.sin((Minecraft.getMinecraft().theWorld.getTotalWorldTime() + Minecraft.getSystemTime()) * 0.00075f) * 0.1f;
@@ -94,9 +96,12 @@ public class TrophyItemRenderer implements IItemRenderer {
         float rotation = ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() + Minecraft.getSystemTime()) * 0.035f) % 360.0F;
         GL11.glRotatef(rotation, 0.0F, 1.0F, 0.0F);
 
+        RenderItem.renderInFrame = true;
         RenderManager.instance.renderEntityWithPosYaw(this.entityItem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+        RenderItem.renderInFrame = false;
 
         GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glPopMatrix();
     }
 }

@@ -15,6 +15,10 @@ public enum Mixins implements IMixins {
              "MixinMTEBasicMachine")
          .addCommonMixins(
              "MixinMTEMultiBlockBase")
+        .addCommonMixins(
+            "MixinPlayerData")
+        .addCommonMixins(
+            "MixinNetworkMonitor")
          .setPhase(Phase.LATE));
 
 
