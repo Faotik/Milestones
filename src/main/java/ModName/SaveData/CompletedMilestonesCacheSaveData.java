@@ -1,6 +1,9 @@
 package ModName.SaveData;
 
-import ModName.ModName;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -9,10 +12,7 @@ import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import ModName.ModName;
 
 public class CompletedMilestonesCacheSaveData extends WorldSavedData {
 
@@ -53,7 +53,10 @@ public class CompletedMilestonesCacheSaveData extends WorldSavedData {
 
         for (var entry : ModName.completedMilestonesCache.entrySet()) {
             NBTTagCompound playerTag = new NBTTagCompound();
-            playerTag.setString("UUID", entry.getKey().toString());
+            playerTag.setString(
+                "UUID",
+                entry.getKey()
+                    .toString());
 
             NBTTagList milestoneList = new NBTTagList();
             for (String milestone : entry.getValue()) {
@@ -74,7 +77,8 @@ public class CompletedMilestonesCacheSaveData extends WorldSavedData {
             return null;
         }
 
-        CompletedMilestonesCacheSaveData instance = (CompletedMilestonesCacheSaveData) world.mapStorage.loadData(CompletedMilestonesCacheSaveData.class, DATA_NAME);
+        CompletedMilestonesCacheSaveData instance = (CompletedMilestonesCacheSaveData) world.mapStorage
+            .loadData(CompletedMilestonesCacheSaveData.class, DATA_NAME);
 
         if (instance == null) {
             instance = new CompletedMilestonesCacheSaveData();

@@ -7,6 +7,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 public class TrophyTileEntity extends TileEntity {
+
     public String item = "";
 
     @Override

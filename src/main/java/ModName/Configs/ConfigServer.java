@@ -6,6 +6,7 @@ import com.gtnewhorizon.gtnhlib.config.Config;
 
 @Config(modid = MODID, category = "server", configSubDirectory = "Milestones", filename = "server")
 public class ConfigServer {
+
     @Config.DefaultBoolean(true)
     @Config.Order(1)
     public static boolean GTIntegration;

@@ -1,14 +1,16 @@
 package ModName;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import java.util.UUID;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 
-import java.util.UUID;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Utils {
+
     private static final long TICKS_IN_SECOND = 20;
     private static final long TICKS_IN_MINUTES = TICKS_IN_SECOND * 60;
     private static final long TICKS_IN_HOURS = TICKS_IN_MINUTES * 60;
@@ -19,7 +21,8 @@ public class Utils {
         if (server != null && server.getConfigurationManager() != null) {
             for (Object obj : server.getConfigurationManager().playerEntityList) {
                 EntityPlayerMP player = (EntityPlayerMP) obj;
-                if (player.getUniqueID().equals(targetUUID)) {
+                if (player.getUniqueID()
+                    .equals(targetUUID)) {
                     return player;
                 }
             }
@@ -31,17 +34,21 @@ public class Utils {
         String timeString;
         if (timeTicks < TICKS_IN_MINUTES) {
             timeString = (timeTicks / TICKS_IN_SECOND) + "s";
-        }
-        else if (timeTicks < TICKS_IN_HOURS) {
-            timeString = (timeTicks / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
-        }
-        else {
-            timeString = (timeTicks / TICKS_IN_HOURS) + "h " + ((timeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
+        } else if (timeTicks < TICKS_IN_HOURS) {
+            timeString = (timeTicks / TICKS_IN_MINUTES) + "m "
+                + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND)
+                + "s";
+        } else {
+            timeString = (timeTicks / TICKS_IN_HOURS) + "h "
+                + ((timeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES)
+                + "m "
+                + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND)
+                + "s";
         }
         return timeString;
     }
 
-    public static ItemStack getItemStackFromId(String id){
+    public static ItemStack getItemStackFromId(String id) {
         String[] parts = id.split(":");
         String modid = parts[0];
         String name = parts[1];
@@ -51,9 +58,10 @@ public class Utils {
         return new ItemStack(item, 1, meta);
     }
 
-    public static String getIdAndMeta(ItemStack stack){
+    public static String getIdAndMeta(ItemStack stack) {
         int meta = stack.getItemDamage();
-        String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
+        String id = GameRegistry.findUniqueIdentifierFor(stack.getItem())
+            .toString();
         return meta == 0 ? id : id + ":" + meta;
     }
 }

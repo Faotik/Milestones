@@ -1,21 +1,23 @@
 package ModName.Mixins.Late;
 
-import ModName.Mixins.Common;
-import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
-import gregtech.api.metatileentity.implementations.MTEBasicMachine;
+import java.util.UUID;
+
 import net.minecraft.item.ItemStack;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.UUID;
+import ModName.Mixins.Common;
+import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
+import gregtech.api.metatileentity.implementations.MTEBasicMachine;
 
 @Mixin(value = MTEBasicMachine.class, remap = false)
 public abstract class MixinMTEBasicMachine {
+
     @Final
     @Shadow
     public ItemStack[] mOutputItems;
@@ -25,10 +27,8 @@ public abstract class MixinMTEBasicMachine {
         at = @At(
             value = "INVOKE",
             target = "Ljava/util/Arrays;fill([Ljava/lang/Object;Ljava/lang/Object;)V",
-            ordinal = 0
-        ),
-        remap = false
-    )
+            ordinal = 0),
+        remap = false)
     private void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick, CallbackInfo ci) {
         UUID uuid = aBaseMetaTileEntity.getOwnerUuid();
         for (ItemStack stack : mOutputItems) {

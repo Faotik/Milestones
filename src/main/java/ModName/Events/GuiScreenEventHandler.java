@@ -1,22 +1,23 @@
 package ModName.Events;
 
-import ModName.Configs.ConfigClient;
-import ModName.Configs.ConfigMilestones;
-import ModName.ModName;
-import ModName.Packets.PacketOpenMilestones;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraftforge.client.event.GuiScreenEvent;
 
+import ModName.Configs.ConfigClient;
+import ModName.ModName;
+import ModName.Packets.PacketOpenMilestones;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 public class GuiScreenEventHandler {
+
     private static final int ACHIEVEMENTS_BUTTON_ID = 5;
     private static final int MILESTONES_BUTTON_ID = 200;
 
     @SubscribeEvent
     public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
-        if (ConfigClient.replaceAchievementButton){
+        if (ConfigClient.replaceAchievementButton) {
             if (event.gui instanceof GuiIngameMenu) {
                 GuiButton achievementsBtn = null;
 
@@ -38,9 +39,7 @@ public class GuiScreenEventHandler {
                             achievementsBtn.yPosition,
                             achievementsBtn.width,
                             achievementsBtn.height,
-                            "Milestones"
-                        )
-                    );
+                            "Milestones"));
                 }
             }
         }
@@ -52,7 +51,8 @@ public class GuiScreenEventHandler {
             if (event.gui instanceof GuiIngameMenu) {
                 if (event.button.id == MILESTONES_BUTTON_ID) {
                     ModName.network.sendToServer(new PacketOpenMilestones());
-                    Minecraft.getMinecraft().displayGuiScreen(null);
+                    Minecraft.getMinecraft()
+                        .displayGuiScreen(null);
                 }
             }
         }

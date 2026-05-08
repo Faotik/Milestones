@@ -6,26 +6,27 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class TrophyModel extends ModelBase {
-	private final ModelRenderer bb_main;
 
-	public TrophyModel() {
-		textureWidth = 64;
-		textureHeight = 64;
+    private final ModelRenderer bb_main;
 
-		bb_main = new ModelRenderer(this);
-		bb_main.setRotationPoint(0.0F, 24.0F, 0.0F);
-		bb_main.cubeList.add(new ModelBox(bb_main, 0, 0, -7.0F, -3.0F, -7.0F, 14, 3, 14, 0.0F));
-		bb_main.cubeList.add(new ModelBox(bb_main, 0, 17, -5.0F, -5.0F, -5.0F, 10, 2, 10, 0.0F));
-	}
+    public TrophyModel() {
+        textureWidth = 64;
+        textureHeight = 64;
 
-	@Override
-	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-		bb_main.render(f5);
-	}
+        bb_main = new ModelRenderer(this);
+        bb_main.setRotationPoint(0.0F, 24.0F, 0.0F);
+        bb_main.cubeList.add(new ModelBox(bb_main, 0, 0, -7.0F, -3.0F, -7.0F, 14, 3, 14, 0.0F));
+        bb_main.cubeList.add(new ModelBox(bb_main, 0, 17, -5.0F, -5.0F, -5.0F, 10, 2, 10, 0.0F));
+    }
 
-	public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-		modelRenderer.rotateAngleX = x;
-		modelRenderer.rotateAngleY = y;
-		modelRenderer.rotateAngleZ = z;
-	}
+    @Override
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+        bb_main.render(f5);
+    }
+
+    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+        modelRenderer.rotateAngleX = x;
+        modelRenderer.rotateAngleY = y;
+        modelRenderer.rotateAngleZ = z;
+    }
 }

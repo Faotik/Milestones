@@ -1,9 +1,10 @@
 package ModName.Mixins;
 
-import ModName.Configs.ConfigServer;
-import ModName.ModName;
-import ModName.SaveData.CompletedMilestonesCacheSaveData;
-import cpw.mods.fml.common.Loader;
+import static ModName.Utils.*;
+
+import java.util.HashSet;
+import java.util.UUID;
+
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,13 +17,14 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
-import java.util.HashSet;
-import java.util.UUID;
-
-import static ModName.Utils.*;
+import ModName.Configs.ConfigServer;
+import ModName.ModName;
+import ModName.SaveData.CompletedMilestonesCacheSaveData;
+import cpw.mods.fml.common.Loader;
 
 public class Common {
-    public static void checkItem(UUID uuid, ItemStack stack){
+
+    public static void checkItem(UUID uuid, ItemStack stack) {
         if (stack == null || stack.getItem() == null) {
             return;
         }
@@ -39,10 +41,12 @@ public class Common {
         }
     }
 
-    public static void completeMilestone(EntityPlayerMP playerMP, UUID uuid, String id){
+    public static void completeMilestone(EntityPlayerMP playerMP, UUID uuid, String id) {
         if (playerMP == null) {
-            if (ModName.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>()).add(id)) {
-                CompletedMilestonesCacheSaveData.get().markDirty();
+            if (ModName.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>())
+                .add(id)) {
+                CompletedMilestonesCacheSaveData.get()
+                    .markDirty();
             }
             return;
         }
@@ -52,20 +56,24 @@ public class Common {
         NBTTagCompound completedMilestones = getNbtTagCompoundMilestones(playerMP);
 
         if (!completedMilestones.hasKey(id)) {
-            long timeTicks = playerMP.func_147099_x().writeStat(StatList.minutesPlayedStat);
+            long timeTicks = playerMP.func_147099_x()
+                .writeStat(StatList.minutesPlayedStat);
             String totalWorldTimeString = getTimeString(timeTicks);
 
             completedMilestones.setLong(id, timeTicks);
 
-            playerMP.addChatMessage(new ChatComponentText(
-                EnumChatFormatting.GRAY + "[New milestone completed!]: " +
-                    EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
-            ));
+            playerMP.addChatMessage(
+                new ChatComponentText(
+                    EnumChatFormatting.GRAY + "[New milestone completed!]: "
+                        + EnumChatFormatting.GREEN
+                        + stack.getDisplayName()
+                        + " - "
+                        + totalWorldTimeString));
 
             if (ConfigServer.enableTrophies) {
                 spawnTrophy(playerMP, id);
             }
-            if (ConfigServer.enableFireworks){
+            if (ConfigServer.enableFireworks) {
                 spawnFirework(playerMP);
             }
         }
@@ -91,7 +99,12 @@ public class Common {
         NBTTagCompound nbt = trophyItemStack.getTagCompound();
         nbt.setString("trophyitem", itemIdAndMeta);
 
-        EntityItem trophyEntity = new EntityItem(player.worldObj, player.posX, player.posY, player.posZ, trophyItemStack);
+        EntityItem trophyEntity = new EntityItem(
+            player.worldObj,
+            player.posX,
+            player.posY,
+            player.posZ,
+            trophyItemStack);
         player.worldObj.spawnEntityInWorld(trophyEntity);
     }
 
@@ -118,7 +131,12 @@ public class Common {
         baseTag.setTag("Fireworks", fireworksTag);
         fireworkItemStack.setTagCompound(baseTag);
 
-        EntityFireworkRocket rocket = new EntityFireworkRocket(player.worldObj, player.posX, player.posY, player.posZ, fireworkItemStack);
+        EntityFireworkRocket rocket = new EntityFireworkRocket(
+            player.worldObj,
+            player.posX,
+            player.posY,
+            player.posZ,
+            fireworkItemStack);
         player.worldObj.spawnEntityInWorld(rocket);
     }
 }

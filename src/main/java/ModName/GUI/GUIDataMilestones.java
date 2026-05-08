@@ -1,9 +1,11 @@
 package ModName.GUI;
 
-import ModName.Configs.ConfigMilestones;
-import com.cleanroommc.modularui.factory.GuiData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+
+import com.cleanroommc.modularui.factory.GuiData;
+
+import ModName.Configs.ConfigMilestones;
 
 public class GUIDataMilestones extends GuiData {
 

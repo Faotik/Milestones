@@ -13,7 +13,7 @@ public class HorizontalHiddenScrollData extends HorizontalScrollData {
     }
 
     @Override
-    public void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme, IDrawable texture){}
+    public void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme, IDrawable texture) {}
 
     @Override
     public void drawScrollShadow(ScrollArea area, ModularGuiContext context) {}

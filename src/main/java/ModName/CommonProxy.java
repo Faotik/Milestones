@@ -1,5 +1,8 @@
 package ModName;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import ModName.Commands.CommandMilestones;
 import ModName.Configs.ConfigMilestones;
 import ModName.Configs.ConfigRegister;
@@ -17,10 +20,8 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 public class CommonProxy {
+
     public void preInit(FMLPreInitializationEvent event) {
         ConfigRegister.init();
         ModName.milestonesList = new HashSet<>(Arrays.asList(ConfigMilestones.items));
@@ -36,7 +37,9 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent event) {
-        FMLCommonHandler.instance().bus().register(new PlayerLoggedInEventHandler());
+        FMLCommonHandler.instance()
+            .bus()
+            .register(new PlayerLoggedInEventHandler());
     }
 
     public void postInit(FMLPostInitializationEvent event) {}

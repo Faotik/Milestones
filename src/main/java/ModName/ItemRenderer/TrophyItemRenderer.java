@@ -1,21 +1,22 @@
 package ModName.ItemRenderer;
 
-import ModName.ModName;
-import ModName.Models.TrophyModel;
-import ModName.TileEntity.TrophyTileEntity;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
 
+import ModName.ModName;
+import ModName.Models.TrophyModel;
+import cpw.mods.fml.common.registry.GameRegistry;
+
 public class TrophyItemRenderer implements IItemRenderer {
+
     private EntityItem entityItem;
     private final TrophyModel model = new TrophyModel();
     private final ResourceLocation texture = new ResourceLocation(ModName.MODID, "textures/blocks/trophy.png");
@@ -59,11 +60,14 @@ public class TrophyItemRenderer implements IItemRenderer {
     }
 
     private void renderItem(ItemRenderType type, ItemStack item) {
-        if (!item.hasTagCompound() || !item.getTagCompound().hasKey("trophyitem")) {
+        if (!item.hasTagCompound() || !item.getTagCompound()
+            .hasKey("trophyitem")) {
             return;
         }
 
-        String[] parts = item.getTagCompound().getString("trophyitem").split(":");
+        String[] parts = item.getTagCompound()
+            .getString("trophyitem")
+            .split(":");
 
         String modid = parts[0];
         String name = parts[1];
@@ -81,7 +85,8 @@ public class TrophyItemRenderer implements IItemRenderer {
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_BLEND);
 
-        float offsetY = (float) Math.sin((Minecraft.getMinecraft().theWorld.getTotalWorldTime() + Minecraft.getSystemTime()) * 0.00075f) * 0.1f;
+        float offsetY = (float) Math
+            .sin((Minecraft.getMinecraft().theWorld.getTotalWorldTime() + Minecraft.getSystemTime()) * 0.00075f) * 0.1f;
         switch (type) {
             case INVENTORY, ENTITY:
                 GL11.glTranslated(0.0, 0.3 + offsetY, 0.0);
@@ -93,7 +98,8 @@ public class TrophyItemRenderer implements IItemRenderer {
                 break;
         }
 
-        float rotation = ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() + Minecraft.getSystemTime()) * 0.035f) % 360.0F;
+        float rotation = ((Minecraft.getMinecraft().theWorld.getTotalWorldTime() + Minecraft.getSystemTime()) * 0.035f)
+            % 360.0F;
         GL11.glRotatef(rotation, 0.0F, 1.0F, 0.0F);
 
         RenderItem.renderInFrame = true;

@@ -1,9 +1,5 @@
 package ModName.Commands;
 
-import ModName.GUI.GUIDataMilestones;
-import ModName.GUI.GUIFactoryMilestones;
-import ModName.ModName;
-import com.cleanroommc.modularui.factory.GuiManager;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,7 +8,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 
+import com.cleanroommc.modularui.factory.GuiManager;
+
+import ModName.GUI.GUIDataMilestones;
+import ModName.GUI.GUIFactoryMilestones;
+import ModName.ModName;
+
 public class CommandMilestones extends CommandBase {
+
     @Override
     public String getCommandName() {
         return "milestones";
@@ -32,8 +35,7 @@ public class CommandMilestones extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
             sender.addChatMessage(new ChatComponentText("Specify subcommand [view|clear]"));
-        }
-        else if (args[0].equals("clear")) {
+        } else if (args[0].equals("clear")) {
             EntityPlayer target;
             if (sender instanceof EntityPlayer) {
                 target = (EntityPlayer) sender;
@@ -51,10 +53,10 @@ public class CommandMilestones extends CommandBase {
                 }
             }
 
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Milestones cleared for " + target.getDisplayName()));
+            sender.addChatMessage(
+                new ChatComponentText(EnumChatFormatting.GREEN + "Milestones cleared for " + target.getDisplayName()));
 
-        }
-        else if (args[0].equals("view")) {
+        } else if (args[0].equals("view")) {
             EntityPlayerMP target;
             if (sender instanceof EntityPlayerMP) {
                 target = (EntityPlayerMP) sender;
@@ -64,8 +66,7 @@ public class CommandMilestones extends CommandBase {
             }
 
             GuiManager.open(new GUIFactoryMilestones(), new GUIDataMilestones(target), target);
-        }
-        else {
+        } else {
             sender.addChatMessage(new ChatComponentText("Incorrect subcommand. Use: /milestones [view|clear]."));
         }
     }

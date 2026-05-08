@@ -1,7 +1,7 @@
 package ModName.BlockContainer;
 
-import ModName.ModName;
-import ModName.TileEntity.TrophyTileEntity;
+import java.util.ArrayList;
+
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -11,7 +11,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
+import ModName.ModName;
+import ModName.TileEntity.TrophyTileEntity;
 
 public class TrophyBlockContainer extends BlockContainer {
 
@@ -48,8 +49,10 @@ public class TrophyBlockContainer extends BlockContainer {
             if (te instanceof TrophyTileEntity) {
                 TrophyTileEntity trophyTE = (TrophyTileEntity) te;
 
-                if (stack.getTagCompound().hasKey("trophyitem")) {
-                    trophyTE.item = stack.getTagCompound().getString("trophyitem");
+                if (stack.getTagCompound()
+                    .hasKey("trophyitem")) {
+                    trophyTE.item = stack.getTagCompound()
+                        .getString("trophyitem");
                     trophyTE.markDirty();
                     world.markBlockForUpdate(x, y, z);
                 }
@@ -79,7 +82,8 @@ public class TrophyBlockContainer extends BlockContainer {
     }
 
     @Override
-    public boolean removedByPlayer(World world, net.minecraft.entity.player.EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+    public boolean removedByPlayer(World world, net.minecraft.entity.player.EntityPlayer player, int x, int y, int z,
+        boolean willHarvest) {
         if (willHarvest) {
             return true;
         }
@@ -88,7 +92,8 @@ public class TrophyBlockContainer extends BlockContainer {
     }
 
     @Override
-    public void harvestBlock(World world, net.minecraft.entity.player.EntityPlayer player, int x, int y, int z, int meta) {
+    public void harvestBlock(World world, net.minecraft.entity.player.EntityPlayer player, int x, int y, int z,
+        int meta) {
         super.harvestBlock(world, player, x, y, z, meta);
         world.setBlockToAir(x, y, z);
     }
