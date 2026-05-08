@@ -6,17 +6,16 @@ import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
 import javax.annotation.Nonnull;
 
 public enum Mixins implements IMixins {
-
-    // MINECRAFT_LATE(new MixinBuilder("Minecraft Late")
-    // .addClientMixins(
-    // "Test")
-    // .setPhase(Phase.LATE)),
-
     MINECRAFT_EARLY(new MixinBuilder("Minecraft Early")
         .addCommonMixins(
             "MixinInventoryPlayer")
-        .setPhase(Phase.EARLY));
-    ;
+        .setPhase(Phase.EARLY)),
+    MINECRAFT_LATE(new MixinBuilder("Minecraft Late")
+         .addCommonMixins(
+             "MixinMTEBasicMachine")
+         .addCommonMixins(
+             "MixinMTEMultiBlockBase")
+         .setPhase(Phase.LATE));
 
 
     private final MixinBuilder builder;

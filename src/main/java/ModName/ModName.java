@@ -1,6 +1,7 @@
 package ModName;
 
 import ModName.BlockContainer.TrophyBlockContainer;
+import ModName.Configs.ConfigMilestones;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraft.block.Block;
@@ -14,6 +15,8 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
+import java.util.*;
+
 @Mod(modid = ModName.MODID, version = Tags.VERSION, name = ModName.MODNAME, acceptedMinecraftVersions = "[1.7.10]")
 public class ModName {
 
@@ -25,13 +28,14 @@ public class ModName {
     public static SimpleNetworkWrapper network;
     public static Block trophyBlock = new TrophyBlockContainer();
 
+    public static Set<String> milestonesList;
+    public static final Map<UUID, Set<String>> completedMilestonesCache = new HashMap<>();
+
     @SidedProxy(clientSide = "ModName.ClientProxy", serverSide = "ModName.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        this.network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-
         proxy.preInit(event);
     }
 

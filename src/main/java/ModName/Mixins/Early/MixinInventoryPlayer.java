@@ -1,6 +1,7 @@
 package ModName.Mixins.Early;
 
 import ModName.Configs.ConfigMilestones;
+import ModName.Mixins.Common;
 import ModName.ModName;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.entity.item.EntityFireworkRocket;
@@ -29,134 +30,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static ModName.Mixins.Common.checkItem;
+
 @Mixin(InventoryPlayer.class)
 public abstract class MixinInventoryPlayer {
-
-    @Unique
-    private static final long TICKS_IN_SECOND = 20;
-    @Unique
-    private static final long TICKS_IN_MINUTES = TICKS_IN_SECOND * 60;
-    @Unique
-    private static final long TICKS_IN_HOURS = TICKS_IN_MINUTES * 60;
-
-    @Unique
-    private static final Set<String> items = new HashSet<>(Arrays.asList(ConfigMilestones.milestones.items));
-
     @Shadow
     public EntityPlayer player;
 
     @Inject(method = "addItemStackToInventory", at = @At("HEAD"))
     private void addItemStackToInventory(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        checkItem(stack);
+        Common.checkItem(player, stack);
     }
 
     @Inject(method = "setInventorySlotContents", at = @At("HEAD"))
     private void setInventorySlotContents(int slot, ItemStack stack, CallbackInfo ci) {
-        checkItem(stack);
-    }
-
-    @Unique
-    private void checkItem(ItemStack stack){
-        if (stack == null || stack.getItem() == null || this.player.worldObj.isRemote) {
-            return;
-        }
-
-        int meta = stack.getItemDamage();
-        String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
-        String itemIdAndMeta = meta == 0 ? id : id + ":" + meta;
-
-        if (items.contains(itemIdAndMeta)){
-            NBTTagCompound milestones = getNbtTagCompoundMilestones();
-            System.out.println(milestones);
-
-            if (!milestones.hasKey(itemIdAndMeta)) {
-                if (player instanceof EntityPlayerMP) {
-                    EntityPlayerMP playerMP = (EntityPlayerMP) player;
-
-                    long timeTicks = playerMP.func_147099_x().writeStat(StatList.minutesPlayedStat);
-                    String totalWorldTimeString = getTimeString(timeTicks);
-
-                    milestones.setLong(itemIdAndMeta, timeTicks);
-
-                    this.player.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.GRAY + "[New milestone completed!]: " +
-                            EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
-                    ));
-
-                    spawnTrophy(itemIdAndMeta);
-                    spawnFirework();
-                }
-            }
-        }
-    }
-
-    @Unique
-    private String getTimeString(long timeTicks) {
-        String timeString;
-        if (timeTicks < TICKS_IN_MINUTES) {
-            timeString = (timeTicks / TICKS_IN_SECOND) + "s";
-        }
-        else if (timeTicks < TICKS_IN_HOURS) {
-            timeString = (timeTicks / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
-        }
-        else {
-            timeString = (timeTicks / TICKS_IN_HOURS) + "h " + ((timeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
-        }
-        return timeString;
-    }
-
-    @Unique
-    private NBTTagCompound getNbtTagCompoundMilestones() {
-        NBTTagCompound entityData = this.player.getEntityData();
-
-        if (!entityData.hasKey(EntityPlayer.PERSISTED_NBT_TAG)) {
-            entityData.setTag(EntityPlayer.PERSISTED_NBT_TAG, new NBTTagCompound());
-        }
-        NBTTagCompound persistedData = entityData.getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
-
-        if (!persistedData.hasKey("CompletedMilestones")) {
-            persistedData.setTag("CompletedMilestones", new NBTTagCompound());
-        }
-        return persistedData.getCompoundTag("CompletedMilestones");
-    }
-
-    @Unique
-    private void spawnTrophy(String itemIdAndMeta) {
-        ItemStack trophyItemStack = new ItemStack(ModName.trophyBlock, 1);
-        trophyItemStack.setTagCompound(new NBTTagCompound());
-        NBTTagCompound nbt = trophyItemStack.getTagCompound();
-        nbt.setString("trophyitem", itemIdAndMeta);
-
-        EntityItem trophyEntity = new EntityItem(player.worldObj, player.posX, player.posY, player.posZ, trophyItemStack);
-        player.worldObj.spawnEntityInWorld(trophyEntity);
-    }
-
-
-    @Unique
-    private void spawnFirework() {
-        ItemStack fireworkItemStack = new ItemStack(Items.fireworks);
-
-        NBTTagCompound baseTag = new NBTTagCompound();
-        NBTTagCompound fireworksTag = new NBTTagCompound();
-        NBTTagList explosionsList = new NBTTagList();
-        NBTTagCompound explosionTag = new NBTTagCompound();
-
-        explosionTag.setByte("Type", (byte) 1);
-        explosionTag.setByte("Flicker", (byte) 1);
-        explosionTag.setByte("Trail", (byte) 0);
-        int[] colors = new int[] { 0xFF0000, 0x00FF00, 0x0000FF };
-        explosionTag.setIntArray("Colors", colors);
-        int[] fadeColors = new int[] { 0xFFFFFF };
-        explosionTag.setIntArray("FadeColors", fadeColors);
-
-        explosionsList.appendTag(explosionTag);
-        fireworksTag.setTag("Explosions", explosionsList);
-        fireworksTag.setByte("Flight", (byte) 0);
-
-        baseTag.setTag("Fireworks", fireworksTag);
-        fireworkItemStack.setTagCompound(baseTag);
-
-        EntityFireworkRocket rocket = new EntityFireworkRocket(player.worldObj, player.posX, player.posY, player.posZ, fireworkItemStack);
-        player.worldObj.spawnEntityInWorld(rocket);
+        Common.checkItem(player, stack);
     }
 }
