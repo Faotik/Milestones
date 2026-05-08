@@ -7,6 +7,7 @@ import ModName.Configs.ConfigRegister;
 import ModName.Events.PlayerLoggedInEventHandler;
 import ModName.GUI.GUIFactoryMilestones;
 import ModName.Packets.PacketOpenMilestones;
+import ModName.SaveData.CompletedMilestonesCacheSaveData;
 import ModName.TileEntity.TrophyTileEntity;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.GuiManager;
@@ -45,5 +46,7 @@ public class CommonProxy {
 
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandMilestones());
+
+        CompletedMilestonesCacheSaveData.get();
     }
 }

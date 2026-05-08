@@ -2,6 +2,7 @@ package ModName.Events;
 
 import ModName.Mixins.Common;
 import ModName.ModName;
+import ModName.SaveData.CompletedMilestonesCacheSaveData;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -30,6 +31,8 @@ public class PlayerLoggedInEventHandler {
 
                         Common.checkItem(player, stack);
                     }
+                    ModName.completedMilestonesCache.remove(player.getUniqueID());
+                    CompletedMilestonesCacheSaveData.get().markDirty();
                 }
             }
         }

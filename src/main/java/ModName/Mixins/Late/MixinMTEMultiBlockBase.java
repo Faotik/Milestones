@@ -2,6 +2,7 @@ package ModName.Mixins.Late;
 
 import ModName.Mixins.Common;
 import ModName.ModName;
+import ModName.SaveData.CompletedMilestonesCacheSaveData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.metatileentity.implementations.MTEMultiBlockBase;
@@ -26,7 +27,11 @@ public abstract class MixinMTEMultiBlockBase {
         UUID uuid = ((MTEMultiBlockBase) (Object) this).getBaseMetaTileEntity().getOwnerUuid();
         EntityPlayerMP player = getPlayerByUUID(uuid);
 
+        boolean needUpdate = false;
         for (ItemStack stack : outputItems) {
+            if (stack == null) {
+                continue;
+            }
             int meta = stack.getItemDamage();
             String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
             String itemIdAndMeta = meta == 0 ? id : id + ":" + meta;
@@ -34,9 +39,15 @@ public abstract class MixinMTEMultiBlockBase {
                 if (player != null) {
                     Common.checkItem(player, stack);
                 } else {
-                    ModName.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>()).add(itemIdAndMeta);
+                    if (ModName.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>()).add(itemIdAndMeta)) {
+                        needUpdate = true;
+                    }
                 }
             }
+        }
+
+        if (needUpdate) {
+            CompletedMilestonesCacheSaveData.get().markDirty();
         }
     }
 }
