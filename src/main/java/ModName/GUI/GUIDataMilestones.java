@@ -13,7 +13,7 @@ public class GUIDataMilestones extends GuiData {
     public GUIDataMilestones(EntityPlayer player) {
         super(player);
         this.completedMilestones = getNbtTagCompoundMilestones();
-        this.allMilestones = ConfigMilestones.milestones.items;
+        this.allMilestones = ConfigMilestones.items;
     }
 
     private NBTTagCompound getNbtTagCompoundMilestones() {

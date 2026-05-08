@@ -1,8 +1,6 @@
 package ModName;
 
 import ModName.BlockContainer.TrophyBlockContainer;
-import ModName.Configs.ConfigMilestones;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraft.block.Block;
 import org.apache.logging.log4j.LogManager;

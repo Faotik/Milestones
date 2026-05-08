@@ -1,53 +1,41 @@
 package ModName.Mixins;
 
+import ModName.Configs.ConfigServer;
 import ModName.ModName;
 import ModName.SaveData.CompletedMilestonesCacheSaveData;
-import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.Loader;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
-import serverutils.lib.data.ForgePlayer;
-import serverutils.lib.data.ForgeTeam;
-import serverutils.lib.data.ServerUtilitiesAPI;
-import serverutils.lib.data.Universe;
 
 import java.util.HashSet;
 import java.util.UUID;
 
-public class Common {
-    private static final long TICKS_IN_SECOND = 20;
-    private static final long TICKS_IN_MINUTES = TICKS_IN_SECOND * 60;
-    private static final long TICKS_IN_HOURS = TICKS_IN_MINUTES * 60;
+import static ModName.Utils.*;
 
+public class Common {
     public static void checkItem(UUID uuid, ItemStack stack){
         if (stack == null || stack.getItem() == null) {
             return;
         }
 
-        String idAndMeta = getIdAndMeta(stack);
+        if (Loader.isModLoaded("serverutilities") && ConfigServer.SUIntegration) {
+            ServerUtilitiesHandler.checkItemTeam(uuid, stack);
+            return;
+        }
 
-        if (ModName.milestonesList.contains(idAndMeta)){
-            ForgeTeam team = Universe.get().getTeam(ServerUtilitiesAPI.getTeam(uuid));
-            if (!team.getMembers().isEmpty()) {
-                for (ForgePlayer member : team.getMembers()) {
-                    EntityPlayerMP playerMP = member.isOnline() ? member.getPlayer() : null;
-                    completeMilestone(playerMP, uuid, idAndMeta);
-                }
-            }
-            else {
-                EntityPlayerMP playerMP = getPlayerByUUID(uuid);
-                completeMilestone(playerMP, uuid, idAndMeta);
-            }
+        String idAndMeta = getIdAndMeta(stack);
+        if (ModName.milestonesList.contains(idAndMeta)) {
+            EntityPlayerMP playerMP = getPlayerByUUID(uuid);
+            completeMilestone(playerMP, uuid, idAndMeta);
         }
     }
 
@@ -74,39 +62,13 @@ public class Common {
                     EnumChatFormatting.GREEN + stack.getDisplayName() + " - " + totalWorldTimeString
             ));
 
-            spawnTrophy(playerMP, id);
-            spawnFirework(playerMP);
+            if (ConfigServer.enableTrophies) {
+                spawnTrophy(playerMP, id);
+            }
+            if (ConfigServer.enableFireworks){
+                spawnFirework(playerMP);
+            }
         }
-    }
-
-    public static ItemStack getItemStackFromId(String id){
-        String[] parts = id.split(":");
-        String modid = parts[0];
-        String name = parts[1];
-        int meta = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
-
-        Item item = GameRegistry.findItem(modid, name);
-        return new ItemStack(item, 1, meta);
-    }
-
-    private static String getIdAndMeta(ItemStack stack){
-        int meta = stack.getItemDamage();
-        String id = GameRegistry.findUniqueIdentifierFor(stack.getItem()).toString();
-        return meta == 0 ? id : id + ":" + meta;
-    }
-
-    private static String getTimeString(long timeTicks) {
-        String timeString;
-        if (timeTicks < TICKS_IN_MINUTES) {
-            timeString = (timeTicks / TICKS_IN_SECOND) + "s";
-        }
-        else if (timeTicks < TICKS_IN_HOURS) {
-            timeString = (timeTicks / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
-        }
-        else {
-            timeString = (timeTicks / TICKS_IN_HOURS) + "h " + ((timeTicks % TICKS_IN_HOURS) / TICKS_IN_MINUTES) + "m " + ((timeTicks % TICKS_IN_MINUTES) / TICKS_IN_SECOND) + "s";
-        }
-        return timeString;
     }
 
     private static NBTTagCompound getNbtTagCompoundMilestones(EntityPlayer player) {
@@ -158,19 +120,5 @@ public class Common {
 
         EntityFireworkRocket rocket = new EntityFireworkRocket(player.worldObj, player.posX, player.posY, player.posZ, fireworkItemStack);
         player.worldObj.spawnEntityInWorld(rocket);
-    }
-
-    public static EntityPlayerMP getPlayerByUUID(UUID targetUUID) {
-        MinecraftServer server = MinecraftServer.getServer();
-
-        if (server != null && server.getConfigurationManager() != null) {
-            for (Object obj : server.getConfigurationManager().playerEntityList) {
-                EntityPlayerMP player = (EntityPlayerMP) obj;
-                if (player.getUniqueID().equals(targetUUID)) {
-                    return player;
-                }
-            }
-        }
-        return null;
     }
 }

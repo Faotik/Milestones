@@ -2,8 +2,6 @@ package ModName.Mixins.Late;
 
 import ModName.Mixins.Common;
 import ModName.Mixins.IPlayerDataAccessor;
-import ModName.ModName;
-import ModName.SaveData.CompletedMilestonesCacheSaveData;
 import appeng.api.config.Actionable;
 import appeng.api.networking.security.BaseActionSource;
 import appeng.api.networking.security.IActionHost;
@@ -14,8 +12,6 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IAEStack;
 import appeng.core.worlddata.WorldData;
 import appeng.me.cache.NetworkMonitor;
-import cpw.mods.fml.common.registry.GameRegistry;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,9 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.HashSet;
 import java.util.UUID;
 
-import static ModName.Mixins.Common.getPlayerByUUID;
-
-@Mixin(NetworkMonitor.class)
+@Mixin(value = NetworkMonitor.class, remap = false)
 public abstract class MixinNetworkMonitor<T extends IAEStack<T>> implements IMEMonitor<T> {
     @Inject(
         method = "injectItems",

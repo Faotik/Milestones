@@ -1,6 +1,8 @@
 package ModName;
 
+import ModName.Configs.ConfigClient;
 import ModName.Configs.ConfigRegister;
+import ModName.Configs.ConfigServer;
 import ModName.Events.GuiScreenEventHandler;
 import ModName.GUI.GUIFactoryMilestones;
 import ModName.ItemRenderer.TrophyItemRenderer;
@@ -19,13 +21,17 @@ public class ClientProxy extends CommonProxy {
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
 
-        ClientRegistry.bindTileEntitySpecialRenderer(TrophyTileEntity.class, new TrophyTESR());
+        if (ConfigServer.enableTrophies) {
+            ClientRegistry.bindTileEntitySpecialRenderer(TrophyTileEntity.class, new TrophyTESR());
+        }
     }
 
     public void init(FMLInitializationEvent event) {
         super.init(event);
 
-        MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModName.trophyBlock), new TrophyItemRenderer());
+        if (ConfigServer.enableTrophies) {
+            MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(ModName.trophyBlock), new TrophyItemRenderer());
+        }
         GuiManager.registerFactory(new GUIFactoryMilestones());
         MinecraftForge.EVENT_BUS.register(new GuiScreenEventHandler());
     }

@@ -1,5 +1,6 @@
 package ModName.Events;
 
+import ModName.Configs.ConfigClient;
 import ModName.Configs.ConfigMilestones;
 import ModName.ModName;
 import ModName.Packets.PacketOpenMilestones;
@@ -15,7 +16,7 @@ public class GuiScreenEventHandler {
 
     @SubscribeEvent
     public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
-        if (ConfigMilestones.ui.replaceAchievementButton){
+        if (ConfigClient.replaceAchievementButton){
             if (event.gui instanceof GuiIngameMenu) {
                 GuiButton achievementsBtn = null;
 
@@ -47,7 +48,7 @@ public class GuiScreenEventHandler {
 
     @SubscribeEvent
     public void onActionPerformed(GuiScreenEvent.ActionPerformedEvent.Post event) {
-        if (ConfigMilestones.ui.replaceAchievementButton) {
+        if (ConfigClient.replaceAchievementButton) {
             if (event.gui instanceof GuiIngameMenu) {
                 if (event.button.id == MILESTONES_BUTTON_ID) {
                     ModName.network.sendToServer(new PacketOpenMilestones());

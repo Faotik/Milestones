@@ -7,6 +7,8 @@ public class ConfigRegister {
 
     public static void init() {
         register(ConfigMilestones.class);
+        register(ConfigClient.class);
+        register(ConfigServer.class);
     }
 
     private static void register(Class<?> configClass) {

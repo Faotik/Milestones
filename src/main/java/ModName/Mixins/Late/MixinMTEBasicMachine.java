@@ -1,27 +1,20 @@
 package ModName.Mixins.Late;
 
 import ModName.Mixins.Common;
-import ModName.ModName;
-import ModName.SaveData.CompletedMilestonesCacheSaveData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.metatileentity.implementations.MTEBasicMachine;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.HashSet;
 import java.util.UUID;
 
-import static ModName.Mixins.Common.checkItem;
-import static ModName.Mixins.Common.getPlayerByUUID;
-
-@Mixin(MTEBasicMachine.class)
+@Mixin(value = MTEBasicMachine.class, remap = false)
 public abstract class MixinMTEBasicMachine {
     @Final
     @Shadow
