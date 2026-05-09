@@ -1,9 +1,11 @@
 package ModName.GUI;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cleanroommc.modularui.drawable.Rectangle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +31,7 @@ import com.cleanroommc.modularui.widgets.layout.Grid;
 import ModName.ModName;
 import ModName.UI.HorizontalHiddenScrollData;
 import cpw.mods.fml.common.registry.GameRegistry;
+import serverutils.lib.gui.Theme;
 
 public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
@@ -51,8 +54,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
     final int tabOffsetY = -26;
     final int tabSize = 22;
     final int tabGridHeight = 27;
-    final int tabIconSize = 18;
-    final int tabPadding = (22 - tabIconSize) / 2;
+    final int tabIconSize = 16;
+    final int tabPadding = (tabSize - tabIconSize) / 2;
     final int milestoneWidth = columnWidth - 16;
     final int milestoneHeight = 22;
     final int milestonePadding = 2;
@@ -68,7 +71,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         int columnIndex = 0;
         int tabIndex = 0;
 
-        ModularPanel panel = new ModularPanel("milestonesgui").size(panelWidth, panelHeight);
+        ModularPanel panel = new ModularPanel("milestonesgui")
+            .size(panelWidth, panelHeight);
 
         String[] allMilestones = guiData.allMilestones;
 
@@ -102,7 +106,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 tab = new ListWidget<>().size(panelWidth - 6, panelHeight - 6)
                     .marginLeft(3)
                     .marginTop(3)
-                    .scrollDirection(new VerticalScrollData());
+                    .scrollDirection(new VerticalScrollData(false, 8));
 
                 String[] parts = milestone.split(",");
                 String[] partsItem = parts[1].split(":");

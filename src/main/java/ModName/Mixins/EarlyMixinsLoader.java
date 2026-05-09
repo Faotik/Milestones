@@ -37,7 +37,7 @@ public class EarlyMixinsLoader implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String getMixinConfig() {
-        return "mixins.ModName.early.json";
+        return "mixins.modname.early.json";
     }
 
     @Override

@@ -53,9 +53,24 @@ public class TrophyBlockContainer extends BlockContainer {
                     .hasKey("trophyitem")) {
                     trophyTE.item = stack.getTagCompound()
                         .getString("trophyitem");
-                    trophyTE.markDirty();
-                    world.markBlockForUpdate(x, y, z);
                 }
+                if (stack.getTagCompound()
+                    .hasKey("trophyownername")) {
+                    trophyTE.ownerName = stack.getTagCompound()
+                        .getString("trophyownername");
+                }
+                if (stack.getTagCompound()
+                    .hasKey("trophyplaytime")) {
+                    trophyTE.playtime = stack.getTagCompound()
+                        .getInteger("trophyplaytime");
+                }
+                if (stack.getTagCompound()
+                    .hasKey("trophydate")) {
+                    trophyTE.date = stack.getTagCompound()
+                        .getLong("trophydate");
+                }
+                trophyTE.markDirty();
+                world.markBlockForUpdate(x, y, z);
             }
         }
     }
@@ -73,6 +88,9 @@ public class TrophyBlockContainer extends BlockContainer {
             if (trophyTE.item != null && !trophyTE.item.isEmpty()) {
                 NBTTagCompound nbt = new NBTTagCompound();
                 nbt.setString("trophyitem", trophyTE.item);
+                nbt.setString("trophyownername", trophyTE.ownerName);
+                nbt.setInteger("trophyplaytime", trophyTE.playtime);
+                nbt.setLong("trophydate", trophyTE.date);
                 dropStack.setTagCompound(nbt);
             }
         }

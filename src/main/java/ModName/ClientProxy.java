@@ -24,6 +24,7 @@ public class ClientProxy extends CommonProxy {
         if (ConfigServer.enableTrophies) {
             ClientRegistry.bindTileEntitySpecialRenderer(TrophyTileEntity.class, new TrophyTESR());
         }
+        GuiManager.registerFactory(new GUIFactoryMilestones());
     }
 
     public void init(FMLInitializationEvent event) {
@@ -33,7 +34,6 @@ public class ClientProxy extends CommonProxy {
             MinecraftForgeClient
                 .registerItemRenderer(Item.getItemFromBlock(ModName.trophyBlock), new TrophyItemRenderer());
         }
-        GuiManager.registerFactory(new GUIFactoryMilestones());
         MinecraftForge.EVENT_BUS.register(new GuiScreenEventHandler());
     }
 

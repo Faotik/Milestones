@@ -8,6 +8,7 @@ import ModName.Configs.ConfigMilestones;
 import ModName.Configs.ConfigRegister;
 import ModName.Configs.ConfigServer;
 import ModName.Events.PlayerLoggedInEventHandler;
+import ModName.ItemBlock.TrophyItemBlock;
 import ModName.Packets.PacketOpenMilestones;
 import ModName.SaveData.CompletedMilestonesCacheSaveData;
 import ModName.TileEntity.TrophyTileEntity;
@@ -29,7 +30,7 @@ public class CommonProxy {
         ModName.network = NetworkRegistry.INSTANCE.newSimpleChannel(ModName.MODID);
 
         if (ConfigServer.enableTrophies) {
-            GameRegistry.registerBlock(ModName.trophyBlock, "trophy");
+            GameRegistry.registerBlock(ModName.trophyBlock, TrophyItemBlock.class, "trophy");
             GameRegistry.registerTileEntity(TrophyTileEntity.class, "trophy");
         }
 

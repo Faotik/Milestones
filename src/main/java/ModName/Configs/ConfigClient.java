@@ -1,10 +1,9 @@
 package ModName.Configs;
 
-import static ModName.ModName.MODID;
-
+import ModName.ModName;
 import com.gtnewhorizon.gtnhlib.config.Config;
 
-@Config(modid = MODID, category = "client", configSubDirectory = "Milestones", filename = "client")
+@Config(modid = ModName.MODID, category = "client", configSubDirectory = "Milestones", filename = "client")
 public class ConfigClient {
 
     @Config.DefaultBoolean(false)

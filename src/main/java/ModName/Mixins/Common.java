@@ -5,6 +5,7 @@ import static ModName.Utils.*;
 import java.util.HashSet;
 import java.util.UUID;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -93,11 +94,14 @@ public class Common {
         return persistedData.getCompoundTag("CompletedMilestones");
     }
 
-    private static void spawnTrophy(EntityPlayer player, String itemIdAndMeta) {
+    private static void spawnTrophy(EntityPlayerMP player, String itemIdAndMeta) {
         ItemStack trophyItemStack = new ItemStack(ModName.trophyBlock, 1);
         trophyItemStack.setTagCompound(new NBTTagCompound());
         NBTTagCompound nbt = trophyItemStack.getTagCompound();
         nbt.setString("trophyitem", itemIdAndMeta);
+        nbt.setString("trophyownername", player.getDisplayName());
+        nbt.setInteger("trophyplaytime", player.func_147099_x().writeStat(StatList.minutesPlayedStat));
+        nbt.setLong("trophydate", System.currentTimeMillis());
 
         EntityItem trophyEntity = new EntityItem(
             player.worldObj,

@@ -14,7 +14,7 @@ public class LateMixinsLoader implements ILateMixinLoader {
 
     @Override
     public String getMixinConfig() {
-        return "mixins.ModName.late.json";
+        return "mixins.modname.late.json";
     }
 
     @Nonnull

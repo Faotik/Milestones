@@ -1,1 +1,6 @@
 tile.trophy.name=Trophy
+tooltip.trophy.owner=Awarded to
+tooltip.trophy.item=Milestone
+tooltip.trophy.playtime=Play time
+tooltip.trophy.date=Completed at
+tooltip.trophy.empty=A blank trophy.
