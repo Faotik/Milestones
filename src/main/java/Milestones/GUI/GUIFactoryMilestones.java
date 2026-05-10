@@ -4,6 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Milestones.UI.VerticalHiddenScrollData;
+import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +38,7 @@ import com.cleanroommc.modularui.widgets.layout.Grid;
 import Milestones.Milestones;
 import Milestones.UI.HorizontalHiddenScrollData;
 import cpw.mods.fml.common.registry.GameRegistry;
+import org.jetbrains.annotations.Nullable;
 
 public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
@@ -36,8 +46,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
     private static final long TICKS_IN_MINUTES = TICKS_IN_SECOND * 60;
     private static final long TICKS_IN_HOURS = TICKS_IN_MINUTES * 60;
 
-    final int panelWidth = 400;
-    final int panelHeight = 300;
+    final int panelWidth = 350;
+    final int panelHeight = 250;
     final int columnOffset = 10;
     final int rowOffset = 10;
     final int columnCount = 4;
@@ -48,8 +58,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
     final int sectionTitleOffsetY = 8;
     final int tabTitleOffsetY = 10;
     final int tabOffsetX = 2;
-    final int tabOffsetY = -26;
-    final int tabSize = 22;
+    final int tabOffsetY = -46; //-26
+    final int tabSize = 0; // 22
     final int tabGridHeight = 27;
     final int tabIconSize = 16;
     final int tabPadding = (tabSize - tabIconSize) / 2;
@@ -57,6 +67,8 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
     final int milestoneHeight = 22;
     final int milestonePadding = 2;
     final int milestoneGap = 10;
+
+    private String tabTitle = "";
 
     @Override
     public String getFactoryName() {
@@ -69,12 +81,48 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         int tabIndex = 0;
 
         ModularPanel panel = new ModularPanel("milestonesgui")
-            .size(panelWidth, panelHeight);
+            .size(panelWidth, panelHeight)
+            .background((context, x, y, width, height, widgetTheme) -> {
+                GuiDraw.drawRect(0, 0, width, height, 0xff403f40);
+            })
+            .overlay((context, x, y, width, height, widgetTheme) -> {
+                int borderColor = 0xff313031;
+                float thickness = 5.0f;
+                float topThickness = 20.0f;
+
+                //Border
+                GuiDraw.drawRect(-thickness, -topThickness, width + thickness * 2, topThickness, borderColor);
+                GuiDraw.drawRect(width, -topThickness, thickness, height + topThickness + thickness, borderColor);
+                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
+                GuiDraw.drawRect(-thickness, -topThickness, thickness, height + topThickness + thickness, borderColor);
+
+                int lightShadowColor = 0xffaaaaaa;
+                int lightShadowColorTransparent = 0x00aaaaaa;
+                int darkShadowColor = 0xff282828;
+                int darkShadowColorTransparent = 0x10282828;
+                int blackShadowColor = 0xff101010;
+                int blackShadowColorTransparent = 0x10101010;
+                float lightShadowThickness = 0.8f;
+                float darkShadowThickness = 2.0f;
+
+                //Outer shadow
+                GuiDraw.drawVerticalGradientRect(-thickness, -topThickness - lightShadowThickness, width + thickness * 2 + lightShadowThickness * 0.5f, lightShadowThickness, lightShadowColorTransparent, lightShadowColor);
+                GuiDraw.drawHorizontalGradientRect(width + thickness, -topThickness - lightShadowThickness * 0.5f, lightShadowThickness, height + topThickness + thickness, darkShadowColor, darkShadowColorTransparent);
+                GuiDraw.drawVerticalGradientRect(-thickness, height + thickness, width + thickness * 2, darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(-thickness - darkShadowThickness, -topThickness - lightShadowThickness, darkShadowThickness, height + topThickness + thickness + lightShadowThickness + darkShadowThickness * 0.3f, darkShadowColorTransparent, darkShadowColor);
+
+                //Inner shadow
+                GuiDraw.drawVerticalGradientRect(0, 0, width, darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(width - darkShadowThickness, 0, darkShadowThickness, height, blackShadowColorTransparent, blackShadowColor);
+                GuiDraw.drawVerticalGradientRect(0, height - darkShadowThickness, width, darkShadowThickness, blackShadowColorTransparent, blackShadowColor);
+                GuiDraw.drawHorizontalGradientRect(0, 0, darkShadowThickness, height, blackShadowColor, blackShadowColorTransparent);
+            });
 
         String[] allMilestones = guiData.allMilestones;
 
         List<Widget<?>> tabPanels = new ArrayList<>();
         List<Widget<?>> tabButtons = new ArrayList<>();
+        List<String> tabTitles = new ArrayList<>();
 
         Grid tabGrid = new Grid().size(panelWidth - tabOffsetX * 2, tabGridHeight)
             .pos(tabOffsetX, tabOffsetY)
@@ -82,7 +130,90 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
             .minElementMargin(tabPadding)
             .scrollable(new HorizontalHiddenScrollData(true));
 
-        panel.child(ButtonWidget.panelCloseButton());
+        int closeButtonSize = 12;
+        Widget<?> cross = new Widget<>()
+            .background(GuiTextures.CROSS);
+        cross.size(8);
+        cross.posRel(0.5f, 0.5f);
+        panel.child(new ButtonWidget<>()
+            .pos(panelWidth - closeButtonSize - 2, -20 + ((20 - closeButtonSize) / 2))
+            .size(closeButtonSize)
+            .background((context, x, y, width, height, widgetTheme) -> {
+                GuiDraw.drawRect(0, 0, width, height, 0xff313031);
+            })
+            .overlay((context, x, y, width, height, widgetTheme) -> {
+//                int borderColor = 0xff313031;
+                float thickness = 1.2f;
+
+//                //Border
+//                GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
+//                GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
+//                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
+//                GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
+
+                int topShadowColor = 0xff101010;
+                int topShadowColorTransparent = 0x10101010;
+                int rightShadowColor = 0xff201a1a;
+                int rightShadowColorTransparent = 0x10201a1a;
+                int bottomShadowColor = 0xff565352;
+                int bottomShadowColorTransparent = 0x00565352;
+                int leftShadowColor = 0xff201a1a;
+                int leftShadowColorTransparent = 0x10201a1a;
+
+                int topShadowColorInner = 0xff565352;
+                int topShadowColorTransparentInner = 0x00565352;
+                int rightShadowColorInner = 0xff201a1a;
+                int rightShadowColorTransparentInner = 0x10201a1a;
+                int bottomShadowColorInner = 0xff101010;
+                int bottomShadowColorTransparentInner = 0x10101010;
+                int leftShadowColorInner = 0xff201a1a;
+                int leftShadowColorTransparentInner = 0x10201a1a;
+
+                //Outer shadow
+                GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, -thickness, width + thickness * 0.4f, thickness, topShadowColorTransparent, topShadowColor);
+                GuiDraw.drawHorizontalGradientRect(width, -thickness * 0.2f, thickness * 0.5f, height + thickness * 0.4f, rightShadowColor, rightShadowColorTransparent);
+                GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness, bottomShadowColor, bottomShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(-thickness * 0.5f, -thickness * 0.2f, thickness * 0.5f, height + thickness * 0.4f, leftShadowColorTransparent, leftShadowColor);
+
+                //Inner shadow
+                GuiDraw.drawVerticalGradientRect(0, 0, width, thickness, topShadowColorInner, topShadowColorTransparentInner);
+                GuiDraw.drawHorizontalGradientRect(width - thickness * 0.5f, 0, thickness * 0.5f, height, rightShadowColorTransparentInner, rightShadowColorInner);
+                GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness, bottomShadowColorTransparentInner, bottomShadowColorInner);
+                GuiDraw.drawHorizontalGradientRect(0, 0, thickness * 0.5f, height, leftShadowColorInner, leftShadowColorTransparentInner);
+            })
+            .child(
+                cross
+            )
+            .onMousePressed(mouseButton -> {
+                if (mouseButton == 0 || mouseButton == 1) {
+                    panel.closeIfOpen();
+                    return true;
+                }
+                return false;
+            }));
+
+        panel.child(new TextWidget<>
+            (
+                new IKey() {
+                    @Override
+                    public String get() {
+                        return tabTitle;
+                    }
+
+                    @Override
+                    public IKey style(@Nullable EnumChatFormatting formatting) {
+                        return null;
+                    }
+
+                    @Override
+                    public IKey removeStyle() {
+                        return null;
+                    }
+                }
+            )
+            .color(0xfffee5bf)
+            .pos(2, -14)
+            .scale(1.0f));
 
         ListWidget tab = null;
         Grid row = createRow();
@@ -100,10 +231,11 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                     panel.child(tab);
                     columnIndex = 0;
                 }
-                tab = new ListWidget<>().size(panelWidth - 6, panelHeight - 6)
-                    .marginLeft(3)
-                    .marginTop(3)
-                    .scrollDirection(new VerticalScrollData(false, 8));
+                tab = new ListWidget<>().size(panelWidth - 4, panelHeight - 4)
+                    .marginLeft(2)
+                    .marginTop(2)
+                    .scrollDirection(new VerticalScrollData(false, 6));
+                tab.paddingTop(10);
 
                 String[] parts = milestone.split(",");
                 String[] partsItem = parts[1].split(":");
@@ -131,6 +263,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                                         .background(GuiTextures.BUTTON_CLEAN);
                                     tabButtons.get(i)
                                         .marginTop(2);
+                                    tabTitle = tabTitles.get(i);
                                 } else {
                                     tabPanels.get(i)
                                         .setEnabled(false);
@@ -149,13 +282,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 tabGrid.child(button);
 
                 tabIndex++;
-
-                tab.child(
-                    new TextWidget<>(title)
-                        // .posRel(Alignment.TopCenter)
-                        // .marginTop(tabTitleOffsetY)
-                        .height(titleHeight)
-                        .scale(1.5f));
+                tabTitles.add(title);
             } else if (milestone.charAt(0) == '^') {
                 columnIndex = 0;
                 if (!row.getChildren()
@@ -165,7 +292,9 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 }
 
                 tab.child(
-                    new TextWidget<>(milestone.substring(1)).height(16)
+                    new TextWidget<>(milestone.substring(1))
+                        .style(EnumChatFormatting.WHITE)
+                        .height(16)
                         .fullWidth()
                         .textAlign(Alignment.BottomLeft)
                         .paddingLeft(25)
@@ -181,7 +310,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 Item item = GameRegistry.findItem(modid, name);
                 ItemStack stack = new ItemStack(item, 1, meta);
 
-                String timeText = "Incomplete";
+                String timeText = EnumChatFormatting.GRAY + "Incomplete";
                 if (guiData.completedMilestones != null && guiData.completedMilestones.hasKey(milestone)) {
                     timeText = EnumChatFormatting.GREEN + getTimeString(guiData.completedMilestones.getLong(milestone));
                 }
@@ -190,15 +319,19 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                     new ListWidget<>()
                         // .pos(columnIndex * columnWidth + columnOffset, rowIndex * rowHeight + rowOffset)
                         .size(milestoneWidth, milestoneHeight)
-                        .background(GuiTextures.MC_BUTTON)
+//                        .background(GuiTextures.MC_BUTTON)
                         .child(
                             new ItemDisplayWidget().item(stack)
                                 .pos(milestonePadding, milestonePadding)
-                                .addTooltipLine(stack.getDisplayName()))
+                                .addTooltipLine(stack.getDisplayName())
+                                .background(IDrawable.EMPTY)
+                                .hoverBackground(IDrawable.EMPTY))
                         .child(
-                            new TextWidget<>(timeText).textAlign(Alignment.CenterLeft)
+                            new TextWidget<>(timeText)
+                                .textAlign(Alignment.CenterLeft)
                                 .full()
-                                .scale(0.65f)
+                                .scale(0.6f)
+                                .marginTop(1)
                                 .marginLeft(textMarginLeft)));
 
                 columnIndex++;
@@ -225,6 +358,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
             .background(GuiTextures.BUTTON_CLEAN);
         tabButtons.get(0)
             .marginTop(2);
+        tabTitle = tabTitles.get(0);
 
         panel.child(tabGrid);
 
@@ -233,7 +367,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
     private Grid createRow() {
         return new Grid()
-            .size((milestoneWidth + milestoneGap) * columnCount - milestoneGap, milestoneHeight + milestoneGap)
+            .size((milestoneWidth + milestoneGap) * columnCount - milestoneGap, milestoneHeight + milestoneGap / 2)
             .minElementMargin(milestoneGap / 2);
     }
 

@@ -10,7 +10,6 @@ import com.gtnewhorizon.gtnhmixins.builders.TargetModBuilder;
 import Milestones.Configs.ConfigServer;
 
 public enum Mixins implements IMixins {
-
     MINECRAFT_EARLY(new MixinBuilder("Minecraft Early")
         .addCommonMixins("MixinInventoryPlayer")
         .setPhase(Phase.EARLY)),
@@ -27,10 +26,13 @@ public enum Mixins implements IMixins {
         .setApplyIf(() -> ConfigServer.AE2Integration)
         .setPhase(Phase.LATE));
 
+    static {
+        ConfigRegister.init();
+    }
+
     private final MixinBuilder builder;
 
     Mixins(MixinBuilder builder) {
-        ConfigRegister.init();
         this.builder = builder;
     }
 

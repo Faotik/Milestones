@@ -24,7 +24,6 @@ import cpw.mods.fml.relauncher.Side;
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
-        ConfigRegister.init();
         Milestones.milestonesList = new HashSet<>(Arrays.asList(ConfigMilestones.items));
 
         Milestones.network = NetworkRegistry.INSTANCE.newSimpleChannel(Milestones.MODID);
