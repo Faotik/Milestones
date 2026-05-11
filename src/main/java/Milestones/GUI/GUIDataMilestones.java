@@ -7,6 +7,8 @@ import com.cleanroommc.modularui.factory.GuiData;
 
 import Milestones.Configs.ConfigMilestones;
 
+import java.util.*;
+
 public class GUIDataMilestones extends GuiData {
 
     public NBTTagCompound completedMilestones;
@@ -15,7 +17,7 @@ public class GUIDataMilestones extends GuiData {
     public GUIDataMilestones(EntityPlayer player) {
         super(player);
         this.completedMilestones = getNbtTagCompoundMilestones();
-        this.allMilestones = ConfigMilestones.items;
+        this.allMilestones = parseConfig();
     }
 
     private NBTTagCompound getNbtTagCompoundMilestones() {
@@ -30,5 +32,15 @@ public class GUIDataMilestones extends GuiData {
         }
 
         return persistedData.getCompoundTag("CompletedMilestones");
+    }
+
+    private String[] parseConfig(){
+        List<String> result = new ArrayList<>();
+
+        for (String entry : ConfigMilestones.items) {
+            result.add(entry.split("#")[0].trim());
+        }
+
+        return result.toArray(new String[0]);
     }
 }

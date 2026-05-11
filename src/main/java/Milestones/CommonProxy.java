@@ -2,6 +2,7 @@ package Milestones;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import Milestones.Commands.CommandMilestones;
 import Milestones.Configs.ConfigMilestones;
@@ -24,7 +25,7 @@ import cpw.mods.fml.relauncher.Side;
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
-        Milestones.milestonesList = new HashSet<>(Arrays.asList(ConfigMilestones.items));
+        Milestones.milestonesList = parseConfig();
 
         Milestones.network = NetworkRegistry.INSTANCE.newSimpleChannel(Milestones.MODID);
 
@@ -48,5 +49,18 @@ public class CommonProxy {
         event.registerServerCommand(new CommandMilestones());
 
         CompletedMilestonesCacheSaveData.get();
+    }
+
+    private Set<String> parseConfig(){
+        Set<String> result = new HashSet<>();
+
+        for (String entry : ConfigMilestones.items) {
+            if (entry.charAt(0) == '$' || entry.charAt(0) == '^'){
+                continue;
+            }
+            result.add(entry.split("#")[0].trim());
+        }
+
+        return result;
     }
 }
