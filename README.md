@@ -6,6 +6,11 @@ When a milestone is completed, the player receives a notification containing the
 
 The milestone list is displayed through a custom ModularUI interface with support for categories, sections, completion times, item icons, and fluid icons.
 
+## Gallery
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/c89b194e-b6e7-4bf2-be82-7939a78e40fb" />
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/10c0e34e-d044-4d31-9425-a9d0fd6416ca" />
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/6313d153-d8cb-4846-a155-a9d0d53c1fa3" />
+
 ## Features
 
 ### Milestone Tracking
