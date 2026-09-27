@@ -1,12 +1,13 @@
 package Milestones;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import static Milestones.Utils.getFluidStackFromId;
+import static Milestones.Utils.getItemStackFromId;
+
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import Milestones.Commands.CommandMilestones;
 import Milestones.Configs.ConfigMilestones;
-import Milestones.Configs.ConfigRegister;
 import Milestones.Configs.ConfigServer;
 import Milestones.Events.PlayerLoggedInEventHandler;
 import Milestones.ItemBlock.TrophyItemBlock;
@@ -25,8 +26,6 @@ import cpw.mods.fml.relauncher.Side;
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
-        Milestones.milestonesList = parseConfig();
-
         Milestones.network = NetworkRegistry.INSTANCE.newSimpleChannel(Milestones.MODID);
 
         if (ConfigServer.enableTrophies) {
@@ -34,7 +33,8 @@ public class CommonProxy {
             GameRegistry.registerTileEntity(TrophyTileEntity.class, "trophy");
         }
 
-        Milestones.network.registerMessage(PacketOpenMilestones.Handler.class, PacketOpenMilestones.class, 0, Side.SERVER);
+        Milestones.network
+            .registerMessage(PacketOpenMilestones.Handler.class, PacketOpenMilestones.class, 0, Side.SERVER);
     }
 
     public void init(FMLInitializationEvent event) {
@@ -43,7 +43,9 @@ public class CommonProxy {
             .register(new PlayerLoggedInEventHandler());
     }
 
-    public void postInit(FMLPostInitializationEvent event) {}
+    public void postInit(FMLPostInitializationEvent event) {
+        parseConfig();
+    }
 
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandMilestones());
@@ -51,16 +53,31 @@ public class CommonProxy {
         CompletedMilestonesCacheSaveData.get();
     }
 
-    private Set<String> parseConfig(){
-        Set<String> result = new HashSet<>();
-
+    private void parseConfig() {
         for (String entry : ConfigMilestones.items) {
-            if (entry.charAt(0) == '$' || entry.charAt(0) == '^'){
+            if (entry.charAt(0) == '$' || entry.charAt(0) == '^') {
                 continue;
             }
-            result.add(entry.split("#")[0].trim());
-        }
+            String id = entry.split("#")[0].trim();
+            if (!id.isBlank()) {
+                ItemStack itemStack = getItemStackFromId(id);
+                if (itemStack != null) {
+                    Milestones.milestonesIdToItemStack.put(id, itemStack);
+                } else {
+                    FluidStack fluidStack = getFluidStackFromId(id);
+                    if (fluidStack != null) {
+                        Milestones.milestonesIdToFluidStack.put(id, fluidStack);
+                    } else {
+                        continue;
+                    }
+                }
 
-        return result;
+                if (id.split(":").length < 2) {
+                    id += ":0";
+                }
+
+                Milestones.milestonesId.add(id);
+            }
+        }
     }
 }

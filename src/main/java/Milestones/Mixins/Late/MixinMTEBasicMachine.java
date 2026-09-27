@@ -3,6 +3,7 @@ package Milestones.Mixins.Late;
 import java.util.UUID;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,6 +23,9 @@ public abstract class MixinMTEBasicMachine {
     @Shadow
     public ItemStack[] mOutputItems;
 
+    @Shadow
+    public FluidStack mOutputFluid;
+
     @Inject(
         method = "onPostTick",
         at = @At(
@@ -32,7 +36,8 @@ public abstract class MixinMTEBasicMachine {
     private void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick, CallbackInfo ci) {
         UUID uuid = aBaseMetaTileEntity.getOwnerUuid();
         for (ItemStack stack : mOutputItems) {
-            Common.checkItem(uuid, stack);
+            Common.checkMilestone(uuid, stack);
         }
+        Common.checkMilestone(uuid, mOutputFluid);
     }
 }

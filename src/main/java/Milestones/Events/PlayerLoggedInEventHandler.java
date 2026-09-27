@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 
-import Milestones.Mixins.Common;
 import Milestones.Milestones;
+import Milestones.Mixins.Common;
 import Milestones.SaveData.CompletedMilestonesCacheSaveData;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;

@@ -16,6 +16,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.fluids.FluidStack;
 
 import Milestones.Configs.ConfigServer;
 import Milestones.Milestones;
@@ -24,24 +25,51 @@ import cpw.mods.fml.common.Loader;
 
 public class Common {
 
-    public static void checkItem(UUID uuid, ItemStack stack) {
-        if (stack == null || stack.getItem() == null) {
-            return;
-        }
-
+    public static void checkMilestone(UUID uuid, String id) {
         if (Loader.isModLoaded("serverutilities") && ConfigServer.SUIntegration) {
-            ServerUtilitiesHandler.checkItemTeam(uuid, stack);
+            ServerUtilitiesHandler.checkMilestoneTeam(uuid, id);
             return;
         }
 
-        String idAndMeta = getIdAndMeta(stack);
-        if (Milestones.milestonesList.contains(idAndMeta)) {
+        if (Milestones.milestonesId.contains(id)) {
             EntityPlayerMP playerMP = getPlayerByUUID(uuid);
-            completeMilestone(playerMP, uuid, idAndMeta);
+            completeMilestone(playerMP, uuid, id);
         }
     }
 
+    public static void checkMilestone(UUID uuid, ItemStack itemStack) {
+        if (itemStack == null || itemStack.getItem() == null) {
+            return;
+        }
+        checkMilestone(uuid, getIdAndMeta(itemStack));
+    }
+
+    public static void checkMilestone(UUID uuid, FluidStack fluidStack) {
+        if (fluidStack == null || fluidStack.getFluid() == null) {
+            return;
+        }
+        checkMilestone(
+            uuid,
+            fluidStack.getFluid()
+                .getName());
+    }
+
     public static void completeMilestone(EntityPlayerMP playerMP, UUID uuid, String id) {
+        String displayName;
+        {
+            ItemStack itemStack = Milestones.milestonesIdToItemStack.get(id);
+            if (itemStack != null) {
+                displayName = itemStack.getDisplayName();
+            } else {
+                FluidStack fluidStack = Milestones.milestonesIdToFluidStack.get(id);
+                if (fluidStack != null) {
+                    displayName = fluidStack.getLocalizedName();
+                } else {
+                    return;
+                }
+            }
+        }
+
         if (playerMP == null) {
             if (Milestones.completedMilestonesCache.computeIfAbsent(uuid, k -> new HashSet<>())
                 .add(id)) {
@@ -50,8 +78,6 @@ public class Common {
             }
             return;
         }
-
-        ItemStack stack = getItemStackFromId(id);
 
         NBTTagCompound completedMilestones = getNbtTagCompoundMilestones(playerMP);
 
@@ -66,7 +92,7 @@ public class Common {
                 new ChatComponentText(
                     EnumChatFormatting.GRAY + "[New milestone completed!]: "
                         + EnumChatFormatting.GREEN
-                        + stack.getDisplayName()
+                        + displayName
                         + " - "
                         + totalWorldTimeString));
 
@@ -99,7 +125,10 @@ public class Common {
         NBTTagCompound nbt = trophyItemStack.getTagCompound();
         nbt.setString("trophyitem", itemIdAndMeta);
         nbt.setString("trophyownername", player.getDisplayName());
-        nbt.setInteger("trophyplaytime", player.func_147099_x().writeStat(StatList.minutesPlayedStat));
+        nbt.setInteger(
+            "trophyplaytime",
+            player.func_147099_x()
+                .writeStat(StatList.minutesPlayedStat));
         nbt.setLong("trophydate", System.currentTimeMillis());
 
         EntityItem trophyEntity = new EntityItem(

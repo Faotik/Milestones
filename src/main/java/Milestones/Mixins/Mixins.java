@@ -2,25 +2,23 @@ package Milestones.Mixins;
 
 import javax.annotation.Nonnull;
 
-import Milestones.Configs.ConfigRegister;
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
 import com.gtnewhorizon.gtnhmixins.builders.TargetModBuilder;
 
+import Milestones.Configs.ConfigRegister;
 import Milestones.Configs.ConfigServer;
 
 public enum Mixins implements IMixins {
-    MINECRAFT_EARLY(new MixinBuilder("Minecraft Early")
-        .addCommonMixins("MixinInventoryPlayer")
+
+    MINECRAFT_EARLY(new MixinBuilder("Minecraft Early").addCommonMixins("MixinInventoryPlayer")
         .setPhase(Phase.EARLY)),
-    GT_LATE(new MixinBuilder("GT Late")
-        .addCommonMixins("MixinMTEBasicMachine")
+    GT_LATE(new MixinBuilder("GT Late").addCommonMixins("MixinMTEBasicMachine")
         .addCommonMixins("MixinMTEMultiBlockBase")
         .addRequiredMod(new TargetModBuilder().setModId("gregtech"))
         .setApplyIf(() -> ConfigServer.GTIntegration)
         .setPhase(Phase.LATE)),
-    AE2_LATE(new MixinBuilder("AE2 Late")
-        .addCommonMixins("MixinPlayerData")
+    AE2_LATE(new MixinBuilder("AE2 Late").addCommonMixins("MixinPlayerData")
         .addCommonMixins("MixinNetworkMonitor")
         .addRequiredMod(new TargetModBuilder().setModId("appliedenergistics2"))
         .setApplyIf(() -> ConfigServer.AE2Integration)

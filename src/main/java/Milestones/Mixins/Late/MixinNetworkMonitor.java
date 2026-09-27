@@ -3,6 +3,7 @@ package Milestones.Mixins.Late;
 import java.util.UUID;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +18,7 @@ import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.MachineSource;
 import appeng.api.networking.security.PlayerSource;
 import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IAEStack;
 import appeng.core.worlddata.WorldData;
@@ -28,28 +30,30 @@ public abstract class MixinNetworkMonitor<T extends IAEStack<T>> implements IMEM
     @Inject(method = "injectItems", at = @At("HEAD"), remap = false)
     private void onItemsAddedToNetwork(T input, Actionable mode, BaseActionSource src, CallbackInfoReturnable<T> cir) {
         if (mode == Actionable.MODULATE && input != null && input.getStackSize() > 0) {
+            UUID uuid = null;
+
+            if (src instanceof PlayerSource playerSrc) {
+                uuid = playerSrc.player.getUniqueID();
+            } else if (src instanceof MachineSource machineSrc) {
+                IActionHost machine = machineSrc.via;
+                int playerID = machine.getActionableNode()
+                    .getPlayerID();
+                uuid = ((IPlayerDataAccessor) WorldData.instance()
+                    .playerData()).getPlayerMapping()
+                        .get(playerID)
+                        .orNull();
+            }
+
+            if (uuid == null) {
+                return;
+            }
+
             if (input instanceof IAEItemStack AEStack) {
                 ItemStack stack = AEStack.getItemStack();
-
-                UUID uuid = null;
-
-                if (src instanceof PlayerSource playerSrc) {
-                    uuid = playerSrc.player.getUniqueID();
-                } else if (src instanceof MachineSource machineSrc) {
-                    IActionHost machine = machineSrc.via;
-                    int playerID = machine.getActionableNode()
-                        .getPlayerID();
-                    uuid = ((IPlayerDataAccessor) WorldData.instance()
-                        .playerData()).getPlayerMapping()
-                            .get(playerID)
-                            .orNull();
-                }
-
-                if (uuid == null) {
-                    return;
-                }
-
-                Common.checkItem(uuid, stack);
+                Common.checkMilestone(uuid, stack);
+            } else if (input instanceof IAEFluidStack AEStack) {
+                FluidStack stack = AEStack.getFluidStack();
+                Common.checkMilestone(uuid, stack);
             }
         }
     }

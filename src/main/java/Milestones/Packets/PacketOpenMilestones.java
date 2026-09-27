@@ -24,6 +24,7 @@ public class PacketOpenMilestones implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<PacketOpenMilestones, IMessage> {
+
         @Override
         public IMessage onMessage(PacketOpenMilestones message, MessageContext ctx) {
             EntityPlayerMP player = ctx.getServerHandler().playerEntity;

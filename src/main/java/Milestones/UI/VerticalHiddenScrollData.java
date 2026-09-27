@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.widget.scroll.ScrollArea;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 
 public class VerticalHiddenScrollData extends VerticalScrollData {
+
     public VerticalHiddenScrollData(boolean leftAlignment, int thickness) {
         super(leftAlignment, thickness);
     }

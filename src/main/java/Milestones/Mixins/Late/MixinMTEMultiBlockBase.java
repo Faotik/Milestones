@@ -3,6 +3,7 @@ package Milestones.Mixins.Late;
 import java.util.UUID;
 
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +21,15 @@ public abstract class MixinMTEMultiBlockBase {
         UUID uuid = ((MTEMultiBlockBase) (Object) this).getBaseMetaTileEntity()
             .getOwnerUuid();
         for (ItemStack stack : outputItems) {
-            Common.checkItem(uuid, stack);
+            Common.checkMilestone(uuid, stack);
         }
+
+    }
+
+    @Inject(method = "addOutput", at = @At("HEAD"), remap = false)
+    public void addOutput(FluidStack aLiquid, CallbackInfoReturnable<Boolean> cir) {
+        UUID uuid = ((MTEMultiBlockBase) (Object) this).getBaseMetaTileEntity()
+            .getOwnerUuid();
+        Common.checkMilestone(uuid, aLiquid);
     }
 }

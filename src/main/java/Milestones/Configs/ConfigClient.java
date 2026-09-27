@@ -1,7 +1,8 @@
 package Milestones.Configs;
 
-import Milestones.Milestones;
 import com.gtnewhorizon.gtnhlib.config.Config;
+
+import Milestones.Milestones;
 
 @Config(modid = Milestones.MODID, category = "client", configSubDirectory = "Milestones", filename = "client")
 public class ConfigClient {

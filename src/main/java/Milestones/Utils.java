@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 
@@ -19,8 +21,7 @@ public class Utils {
         MinecraftServer server = MinecraftServer.getServer();
 
         if (server != null && server.getConfigurationManager() != null) {
-            for (Object obj : server.getConfigurationManager().playerEntityList) {
-                EntityPlayerMP player = (EntityPlayerMP) obj;
+            for (EntityPlayerMP player : server.getConfigurationManager().playerEntityList) {
                 if (player.getUniqueID()
                     .equals(targetUUID)) {
                     return player;
@@ -50,12 +51,24 @@ public class Utils {
 
     public static ItemStack getItemStackFromId(String id) {
         String[] parts = id.split(":");
+        if (parts.length < 2) {
+            return null;
+        }
         String modid = parts[0];
         String name = parts[1];
         int meta = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
 
         Item item = GameRegistry.findItem(modid, name);
+
+        if (item == null) {
+            return null;
+        }
+
         return new ItemStack(item, 1, meta);
+    }
+
+    public static FluidStack getFluidStackFromId(String id) {
+        return FluidRegistry.getFluidStack(id, 1);
     }
 
     public static String getIdAndMeta(ItemStack stack) {

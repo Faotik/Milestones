@@ -4,24 +4,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Milestones.UI.VerticalHiddenScrollData;
-import com.cleanroommc.modularui.api.IThemeApi;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.widget.sizer.Area;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.fluids.FluidStack;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.cleanroommc.modularui.api.UIFactory;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
@@ -37,8 +32,8 @@ import com.cleanroommc.modularui.widgets.layout.Grid;
 
 import Milestones.Milestones;
 import Milestones.UI.HorizontalHiddenScrollData;
-import cpw.mods.fml.common.registry.GameRegistry;
-import org.jetbrains.annotations.Nullable;
+import Milestones.Utils;
+import gregtech.api.util.GTUtility;
 
 public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
@@ -58,11 +53,11 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
     final int sectionTitleOffsetY = 8;
     final int tabTitleOffsetY = 10;
     final int tabOffsetX = 2;
-    final int tabOffsetY = -47; //-26
+    final int tabOffsetY = -47; // -26
     final int tabSize = 22; // 22
     final int tabGridHeight = 23;
     final int tabIconSize = 16;
-    final int tabPadding = 1; //(tabSize - tabIconSize) / 2;
+    final int tabPadding = 1; // (tabSize - tabIconSize) / 2;
     final int milestoneWidth = columnWidth - 16;
     final int milestoneHeight = 25;
     final int milestonePadding = 0;
@@ -80,18 +75,16 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
         int columnIndex = 0;
         int tabIndex = 0;
 
-        ModularPanel panel = new ModularPanel("milestonesgui")
-            .marginTop(40)
+        ModularPanel panel = new ModularPanel("milestonesgui").marginTop(40)
             .size(panelWidth, panelHeight)
-            .background((context, x, y, width, height, widgetTheme) -> {
-                GuiDraw.drawRect(0, 0, width, height, 0xff403f40);
-            })
+            .background(
+                (context, x, y, width, height, widgetTheme) -> { GuiDraw.drawRect(0, 0, width, height, 0xff403f40); })
             .overlay((context, x, y, width, height, widgetTheme) -> {
                 int borderColor = 0xff313031;
                 float thickness = 5.0f;
                 float topThickness = 20.0f;
 
-                //Border
+                // Border
                 GuiDraw.drawRect(-thickness, -topThickness, width + thickness * 2, topThickness, borderColor);
                 GuiDraw.drawRect(width, -topThickness, thickness, height + topThickness + thickness, borderColor);
                 GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
@@ -106,17 +99,65 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 float lightShadowThickness = 0.8f;
                 float darkShadowThickness = 2.0f;
 
-                //Outer shadow
-                GuiDraw.drawVerticalGradientRect(-thickness + 5, -topThickness, width + thickness * 2 - 5 * 2, lightShadowThickness, lightShadowColorTransparent, lightShadowColor);
-                GuiDraw.drawHorizontalGradientRect(width + thickness, -topThickness + 1, lightShadowThickness, height + topThickness + thickness, darkShadowColor, darkShadowColorTransparent);
-                GuiDraw.drawVerticalGradientRect(-thickness, height + thickness, width + thickness * 2, darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
-                GuiDraw.drawHorizontalGradientRect(-thickness - darkShadowThickness, -topThickness + 1, darkShadowThickness, height + topThickness + thickness + darkShadowThickness * 0.3f, darkShadowColorTransparent, darkShadowColor);
+                // Outer shadow
+                GuiDraw.drawVerticalGradientRect(
+                    -thickness + 5,
+                    -topThickness,
+                    width + thickness * 2 - 5 * 2,
+                    lightShadowThickness,
+                    lightShadowColorTransparent,
+                    lightShadowColor);
+                GuiDraw.drawHorizontalGradientRect(
+                    width + thickness,
+                    -topThickness + 1,
+                    lightShadowThickness,
+                    height + topThickness + thickness,
+                    darkShadowColor,
+                    darkShadowColorTransparent);
+                GuiDraw.drawVerticalGradientRect(
+                    -thickness,
+                    height + thickness,
+                    width + thickness * 2,
+                    darkShadowThickness,
+                    blackShadowColor,
+                    blackShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(
+                    -thickness - darkShadowThickness,
+                    -topThickness + 1,
+                    darkShadowThickness,
+                    height + topThickness + thickness + darkShadowThickness * 0.3f,
+                    darkShadowColorTransparent,
+                    darkShadowColor);
 
-                //Inner shadow
-                GuiDraw.drawVerticalGradientRect(0, 0, width, darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
-                GuiDraw.drawHorizontalGradientRect(width - darkShadowThickness, 0, darkShadowThickness, height, blackShadowColorTransparent, blackShadowColor);
-                GuiDraw.drawVerticalGradientRect(0, height - darkShadowThickness, width, darkShadowThickness, blackShadowColorTransparent, blackShadowColor);
-                GuiDraw.drawHorizontalGradientRect(0, 0, darkShadowThickness, height, blackShadowColor, blackShadowColorTransparent);
+                // Inner shadow
+                GuiDraw.drawVerticalGradientRect(
+                    0,
+                    0,
+                    width,
+                    darkShadowThickness,
+                    blackShadowColor,
+                    blackShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(
+                    width - darkShadowThickness,
+                    0,
+                    darkShadowThickness,
+                    height,
+                    blackShadowColorTransparent,
+                    blackShadowColor);
+                GuiDraw.drawVerticalGradientRect(
+                    0,
+                    height - darkShadowThickness,
+                    width,
+                    darkShadowThickness,
+                    blackShadowColorTransparent,
+                    blackShadowColor);
+                GuiDraw.drawHorizontalGradientRect(
+                    0,
+                    0,
+                    darkShadowThickness,
+                    height,
+                    blackShadowColor,
+                    blackShadowColorTransparent);
             });
         panel.posRel(0.5f, 0.65f);
 
@@ -128,21 +169,35 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
 
         int gridPadding = 0;
         float gridPaddingTop = 4f;
-            ListWidget tabGrid = new ListWidget<>()
-            .pos(0 + gridPadding, -tabGridHeight - 20)
+        ListWidget tabGrid = new ListWidget<>().pos(0 + gridPadding, -tabGridHeight - 20)
             .size(panelWidth - gridPadding * 2, tabGridHeight + 1)
             .paddingLeft(6)
             .paddingRight(6)
-//            .minColWidth(tabSize)
-//            .minElementMargin(tabPadding)
+            // .minColWidth(tabSize)
+            // .minElementMargin(tabPadding)
             .scrollDirection(new HorizontalHiddenScrollData(true))
             .background((context, x, y, width, height, widgetTheme) -> {
                 float thickness = 5.0f;
 
-                GuiDraw.drawRect(-gridPadding, -gridPaddingTop, width + gridPadding * 2, height - 0.8f + gridPaddingTop, 0xff242324);
+                GuiDraw.drawRect(
+                    -gridPadding,
+                    -gridPaddingTop,
+                    width + gridPadding * 2,
+                    height - 0.8f + gridPaddingTop,
+                    0xff242324);
 
-                GuiDraw.drawRect(-thickness - gridPadding, -gridPaddingTop, thickness, height + gridPaddingTop, 0xff313031);
-                GuiDraw.drawRect(-thickness - gridPadding, -thickness - gridPaddingTop, width + thickness * 2 + gridPadding * 2, thickness, 0xff313031);
+                GuiDraw.drawRect(
+                    -thickness - gridPadding,
+                    -gridPaddingTop,
+                    thickness,
+                    height + gridPaddingTop,
+                    0xff313031);
+                GuiDraw.drawRect(
+                    -thickness - gridPadding,
+                    -thickness - gridPaddingTop,
+                    width + thickness * 2 + gridPadding * 2,
+                    thickness,
+                    0xff313031);
                 GuiDraw.drawRect(width + gridPadding, -gridPaddingTop, thickness, height + gridPaddingTop, 0xff313031);
 
                 int lightShadowColor = 0xffaaaaaa;
@@ -154,103 +209,184 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 float lightShadowThickness = 0.8f;
                 float darkShadowThickness = 2.0f;
 
-                //Outer shadow
-                GuiDraw.drawVerticalGradientRect(-thickness - gridPadding, -thickness - lightShadowThickness - gridPaddingTop, width + thickness * 2 + lightShadowThickness * 0.5f + gridPadding * 2 , lightShadowThickness, lightShadowColorTransparent, lightShadowColor);
-                GuiDraw.drawHorizontalGradientRect(width + thickness + gridPadding, -thickness - lightShadowThickness * 0.5f - gridPaddingTop, lightShadowThickness, height + thickness + lightShadowThickness * 0.5f + gridPaddingTop, darkShadowColor, darkShadowColorTransparent);
-//                GuiDraw.drawVerticalGradientRect(-thickness, height + thickness, width + thickness * 2, darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
-                GuiDraw.drawHorizontalGradientRect(-thickness - darkShadowThickness - gridPadding, -thickness - lightShadowThickness - gridPaddingTop, darkShadowThickness, height + thickness + lightShadowThickness + gridPaddingTop, darkShadowColorTransparent, darkShadowColor);
+                // Outer shadow
+                GuiDraw.drawVerticalGradientRect(
+                    -thickness - gridPadding,
+                    -thickness - lightShadowThickness - gridPaddingTop,
+                    width + thickness * 2 + lightShadowThickness * 0.5f + gridPadding * 2,
+                    lightShadowThickness,
+                    lightShadowColorTransparent,
+                    lightShadowColor);
+                GuiDraw.drawHorizontalGradientRect(
+                    width + thickness + gridPadding,
+                    -thickness - lightShadowThickness * 0.5f - gridPaddingTop,
+                    lightShadowThickness,
+                    height + thickness + lightShadowThickness * 0.5f + gridPaddingTop,
+                    darkShadowColor,
+                    darkShadowColorTransparent);
+                // GuiDraw.drawVerticalGradientRect(-thickness, height + thickness, width + thickness * 2,
+                // darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(
+                    -thickness - darkShadowThickness - gridPadding,
+                    -thickness - lightShadowThickness - gridPaddingTop,
+                    darkShadowThickness,
+                    height + thickness + lightShadowThickness + gridPaddingTop,
+                    darkShadowColorTransparent,
+                    darkShadowColor);
 
-                //Inner shadow
-                GuiDraw.drawVerticalGradientRect(-gridPadding, -gridPaddingTop, width + gridPadding * 2, darkShadowThickness, blackShadowColor, blackShadowColorTransparent);
-                GuiDraw.drawHorizontalGradientRect(width - darkShadowThickness + gridPadding, -gridPaddingTop, darkShadowThickness, height + gridPaddingTop, blackShadowColorTransparent, blackShadowColor);
-//                GuiDraw.drawVerticalGradientRect(0, height - darkShadowThickness, width, darkShadowThickness, blackShadowColorTransparent, blackShadowColor);
-                GuiDraw.drawHorizontalGradientRect(-gridPadding, -gridPaddingTop, darkShadowThickness, height + gridPaddingTop, blackShadowColor, blackShadowColorTransparent);
+                // Inner shadow
+                GuiDraw.drawVerticalGradientRect(
+                    -gridPadding,
+                    -gridPaddingTop,
+                    width + gridPadding * 2,
+                    darkShadowThickness,
+                    blackShadowColor,
+                    blackShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(
+                    width - darkShadowThickness + gridPadding,
+                    -gridPaddingTop,
+                    darkShadowThickness,
+                    height + gridPaddingTop,
+                    blackShadowColorTransparent,
+                    blackShadowColor);
+                // GuiDraw.drawVerticalGradientRect(0, height - darkShadowThickness, width, darkShadowThickness,
+                // blackShadowColorTransparent, blackShadowColor);
+                GuiDraw.drawHorizontalGradientRect(
+                    -gridPadding,
+                    -gridPaddingTop,
+                    darkShadowThickness,
+                    height + gridPaddingTop,
+                    blackShadowColor,
+                    blackShadowColorTransparent);
             });
-//            .paddingLeft(6);
-//            .paddingRight(6);
+        // .paddingLeft(6);
+        // .paddingRight(6);
 
         int closeButtonSize = 12;
-        Widget<?> cross = new Widget<>()
-            .background(GuiTextures.CROSS);
+        Widget<?> cross = new Widget<>().background(GuiTextures.CROSS);
         cross.size(8);
         cross.posRel(0.5f, 0.5f);
-        panel.child(new ButtonWidget<>()
-            .pos(panelWidth - closeButtonSize - 2, -20 + ((20 - closeButtonSize) / 2))
-            .size(closeButtonSize)
-            .background((context, x, y, width, height, widgetTheme) -> {
-                GuiDraw.drawRect(0, 0, width, height, 0xff313031);
-            })
-            .overlay((context, x, y, width, height, widgetTheme) -> {
-//                int borderColor = 0xff313031;
-                float thickness = 1.2f;
+        panel.child(
+            new ButtonWidget<>().pos(panelWidth - closeButtonSize - 2, -20 + ((20 - closeButtonSize) / 2))
+                .size(closeButtonSize)
+                .background(
+                    (context, x, y, width, height, widgetTheme) -> {
+                        GuiDraw.drawRect(0, 0, width, height, 0xff313031);
+                    })
+                .overlay((context, x, y, width, height, widgetTheme) -> {
+                    // int borderColor = 0xff313031;
+                    float thickness = 1.2f;
 
-//                //Border
-//                GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
-//                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
+                    // //Border
+                    // GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
+                    // GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
+                    // GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
+                    // GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
 
-                int topShadowColor = 0xff101010;
-                int topShadowColorTransparent = 0x10101010;
-                int rightShadowColor = 0xff201a1a;
-                int rightShadowColorTransparent = 0x10201a1a;
-                int bottomShadowColor = 0xff565352;
-                int bottomShadowColorTransparent = 0x00565352;
-                int leftShadowColor = 0xff201a1a;
-                int leftShadowColorTransparent = 0x10201a1a;
+                    int topShadowColor = 0xff101010;
+                    int topShadowColorTransparent = 0x10101010;
+                    int rightShadowColor = 0xff201a1a;
+                    int rightShadowColorTransparent = 0x10201a1a;
+                    int bottomShadowColor = 0xff565352;
+                    int bottomShadowColorTransparent = 0x00565352;
+                    int leftShadowColor = 0xff201a1a;
+                    int leftShadowColorTransparent = 0x10201a1a;
 
-                int topShadowColorInner = 0xff565352;
-                int topShadowColorTransparentInner = 0x00565352;
-                int rightShadowColorInner = 0xff201a1a;
-                int rightShadowColorTransparentInner = 0x10201a1a;
-                int bottomShadowColorInner = 0xff101010;
-                int bottomShadowColorTransparentInner = 0x10101010;
-                int leftShadowColorInner = 0xff201a1a;
-                int leftShadowColorTransparentInner = 0x10201a1a;
+                    int topShadowColorInner = 0xff565352;
+                    int topShadowColorTransparentInner = 0x00565352;
+                    int rightShadowColorInner = 0xff201a1a;
+                    int rightShadowColorTransparentInner = 0x10201a1a;
+                    int bottomShadowColorInner = 0xff101010;
+                    int bottomShadowColorTransparentInner = 0x10101010;
+                    int leftShadowColorInner = 0xff201a1a;
+                    int leftShadowColorTransparentInner = 0x10201a1a;
 
-                //Outer shadow
-                GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, -thickness, width + thickness * 0.4f, thickness, topShadowColorTransparent, topShadowColor);
-                GuiDraw.drawHorizontalGradientRect(width, -thickness * 0.2f, thickness * 0.5f, height + thickness * 0.4f, rightShadowColor, rightShadowColorTransparent);
-                GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness, bottomShadowColor, bottomShadowColorTransparent);
-                GuiDraw.drawHorizontalGradientRect(-thickness * 0.5f, -thickness * 0.2f, thickness * 0.5f, height + thickness * 0.4f, leftShadowColorTransparent, leftShadowColor);
+                    // Outer shadow
+                    GuiDraw.drawVerticalGradientRect(
+                        -thickness * 0.2f,
+                        -thickness,
+                        width + thickness * 0.4f,
+                        thickness,
+                        topShadowColorTransparent,
+                        topShadowColor);
+                    GuiDraw.drawHorizontalGradientRect(
+                        width,
+                        -thickness * 0.2f,
+                        thickness * 0.5f,
+                        height + thickness * 0.4f,
+                        rightShadowColor,
+                        rightShadowColorTransparent);
+                    GuiDraw.drawVerticalGradientRect(
+                        -thickness * 0.2f,
+                        height,
+                        width + thickness * 0.4f,
+                        thickness,
+                        bottomShadowColor,
+                        bottomShadowColorTransparent);
+                    GuiDraw.drawHorizontalGradientRect(
+                        -thickness * 0.5f,
+                        -thickness * 0.2f,
+                        thickness * 0.5f,
+                        height + thickness * 0.4f,
+                        leftShadowColorTransparent,
+                        leftShadowColor);
 
-                //Inner shadow
-                GuiDraw.drawVerticalGradientRect(0, 0, width, thickness, topShadowColorInner, topShadowColorTransparentInner);
-                GuiDraw.drawHorizontalGradientRect(width - thickness * 0.5f, 0, thickness * 0.5f, height, rightShadowColorTransparentInner, rightShadowColorInner);
-                GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness, bottomShadowColorTransparentInner, bottomShadowColorInner);
-                GuiDraw.drawHorizontalGradientRect(0, 0, thickness * 0.5f, height, leftShadowColorInner, leftShadowColorTransparentInner);
-            })
-            .child(
-                cross
-            )
-            .onMousePressed(mouseButton -> {
-                if (mouseButton == 0 || mouseButton == 1) {
-                    panel.closeIfOpen();
-                    return true;
-                }
-                return false;
-            }));
-
-        panel.child(new TextWidget<>
-            (
-                new IKey() {
-                    @Override
-                    public String get() {
-                        return tabTitle;
+                    // Inner shadow
+                    GuiDraw.drawVerticalGradientRect(
+                        0,
+                        0,
+                        width,
+                        thickness,
+                        topShadowColorInner,
+                        topShadowColorTransparentInner);
+                    GuiDraw.drawHorizontalGradientRect(
+                        width - thickness * 0.5f,
+                        0,
+                        thickness * 0.5f,
+                        height,
+                        rightShadowColorTransparentInner,
+                        rightShadowColorInner);
+                    GuiDraw.drawVerticalGradientRect(
+                        0,
+                        height - thickness,
+                        width,
+                        thickness,
+                        bottomShadowColorTransparentInner,
+                        bottomShadowColorInner);
+                    GuiDraw.drawHorizontalGradientRect(
+                        0,
+                        0,
+                        thickness * 0.5f,
+                        height,
+                        leftShadowColorInner,
+                        leftShadowColorTransparentInner);
+                })
+                .child(cross)
+                .onMousePressed(mouseButton -> {
+                    if (mouseButton == 0 || mouseButton == 1) {
+                        panel.closeIfOpen();
+                        return true;
                     }
+                    return false;
+                }));
 
-                    @Override
-                    public IKey style(@Nullable EnumChatFormatting formatting) {
-                        return null;
-                    }
+        panel.child(new TextWidget<>(new IKey() {
 
-                    @Override
-                    public IKey removeStyle() {
-                        return null;
-                    }
-                }
-            )
-            .color(0xfffee5bf)
+            @Override
+            public String get() {
+                return tabTitle;
+            }
+
+            @Override
+            public IKey style(@Nullable EnumChatFormatting formatting) {
+                return null;
+            }
+
+            @Override
+            public IKey removeStyle() {
+                return null;
+            }
+        }).color(0xfffee5bf)
             .pos(2, -14)
             .scale(1.0f));
 
@@ -275,38 +411,38 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                     columnIndex = 0;
                 }
                 tab = new ListWidget<>().size(panelWidth, panelHeight - 2)
-//                    .marginLeft(2)
+                    // .marginLeft(2)
                     .marginTop(1)
                     .scrollDirection(new VerticalScrollData(false, 6));
                 tab.paddingBottom(10);
 
                 String[] parts = milestone.split(",");
-                String[] partsItem = parts[1].split(":");
                 String title = parts[0].substring(1);
-                String modid = partsItem[0];
-                String name = partsItem[1];
-                int meta = partsItem.length > 2 ? Integer.parseInt(partsItem[2]) : 0;
+                String id = parts[1];
 
-                Item item = GameRegistry.findItem(modid, name);
-                ItemStack stack = new ItemStack(item, 1, meta);
+                ItemStack itemStack = Utils.getItemStackFromId(id);
+                final FluidStack fluidStack = Utils.getFluidStackFromId(id);
+                if (itemStack == null && fluidStack == null) {
+                    continue;
+                }
 
                 final int finalTabIndex = tabIndex;
 
                 Widget<?> button = new ButtonWidget<>().size(tabSize)
-//                    .padding(tabPadding)
+                    // .padding(tabPadding)
                     .marginRight(tabPadding)
                     .addTooltipLine(title)
                     .background((context, x, y, width, height, widgetTheme) -> {
                         GuiDraw.drawRect(0, 0, width, height, 0xff6e6e6e);
 
-//                int borderColor = 0xff313031;
+                        // int borderColor = 0xff313031;
                         float thickness = 1.2f;
 
-//                //Border
-//                GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
-//                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
+                        // //Border
+                        // GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
+                        // GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
+                        // GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
+                        // GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
 
                         int topShadowColor = 0xff101010;
                         int topShadowColorTransparent = 0x10101010;
@@ -326,20 +462,75 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                         int leftShadowColorInner = 0xff201a1a;
                         int leftShadowColorTransparentInner = 0x10201a1a;
 
-                        //Outer shadow
-                        GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, -thickness, width + thickness * 0.4f, thickness, topShadowColorTransparent, topShadowColor);
-                        GuiDraw.drawHorizontalGradientRect(width, -thickness * 0.2f, thickness, height + thickness * 0.4f, rightShadowColor, rightShadowColorTransparent);
-                        GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness * 0.5f, bottomShadowColor, bottomShadowColorTransparent);
-                        GuiDraw.drawHorizontalGradientRect(-thickness, -thickness * 0.2f, thickness, height + thickness * 0.4f, leftShadowColorTransparent, leftShadowColor);
+                        // Outer shadow
+                        GuiDraw.drawVerticalGradientRect(
+                            -thickness * 0.2f,
+                            -thickness,
+                            width + thickness * 0.4f,
+                            thickness,
+                            topShadowColorTransparent,
+                            topShadowColor);
+                        GuiDraw.drawHorizontalGradientRect(
+                            width,
+                            -thickness * 0.2f,
+                            thickness,
+                            height + thickness * 0.4f,
+                            rightShadowColor,
+                            rightShadowColorTransparent);
+                        GuiDraw.drawVerticalGradientRect(
+                            -thickness * 0.2f,
+                            height,
+                            width + thickness * 0.4f,
+                            thickness * 0.5f,
+                            bottomShadowColor,
+                            bottomShadowColorTransparent);
+                        GuiDraw.drawHorizontalGradientRect(
+                            -thickness,
+                            -thickness * 0.2f,
+                            thickness,
+                            height + thickness * 0.4f,
+                            leftShadowColorTransparent,
+                            leftShadowColor);
 
-                        //Inner shadow
-                        GuiDraw.drawVerticalGradientRect(0, 0, width, thickness, topShadowColorInner, topShadowColorTransparentInner);
-                        GuiDraw.drawHorizontalGradientRect(width - thickness, 0, thickness, height, rightShadowColorTransparentInner, rightShadowColorInner);
-                        GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness, bottomShadowColorTransparentInner, bottomShadowColorInner);
-                        GuiDraw.drawHorizontalGradientRect(0, 0, thickness, height, leftShadowColorInner, leftShadowColorTransparentInner);
+                        // Inner shadow
+                        GuiDraw.drawVerticalGradientRect(
+                            0,
+                            0,
+                            width,
+                            thickness,
+                            topShadowColorInner,
+                            topShadowColorTransparentInner);
+                        GuiDraw.drawHorizontalGradientRect(
+                            width - thickness,
+                            0,
+                            thickness,
+                            height,
+                            rightShadowColorTransparentInner,
+                            rightShadowColorInner);
+                        GuiDraw.drawVerticalGradientRect(
+                            0,
+                            height - thickness,
+                            width,
+                            thickness,
+                            bottomShadowColorTransparentInner,
+                            bottomShadowColorInner);
+                        GuiDraw.drawHorizontalGradientRect(
+                            0,
+                            0,
+                            thickness,
+                            height,
+                            leftShadowColorInner,
+                            leftShadowColorTransparentInner);
                     })
                     .overlay((context, x, y, width, height, widgetTheme) -> {
-                        GuiDraw.drawItem(stack, 3, 3, width - 6, height - 6, 0);
+                        System.out.println(itemStack);
+                        System.out.println(fluidStack);
+                        if (itemStack != null) {
+                            GuiDraw.drawItem(itemStack, 3, 3, width - 6, height - 6, 0);
+                            System.out.println(itemStack.getDisplayName());
+                        } else {
+                            GuiDraw.drawFluidTexture(fluidStack, 3, 3, width - 6, height - 6, 0);
+                        }
                     })
                     .onMousePressed(mouseButton -> {
                         if (mouseButton == 0 || mouseButton == 1) {
@@ -351,14 +542,18 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                                         .background((context, x, y, width, height, widgetTheme) -> {
                                             GuiDraw.drawRect(0, 0, width, height + 3, 0xff313031);
 
-                                            //                int borderColor = 0xff313031;
+                                            // int borderColor = 0xff313031;
                                             float thickness = 1.2f;
 
-//                //Border
-//                GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
-//                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
+                                            // //Border
+                                            // GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2,
+                                            // thickness, borderColor);
+                                            // GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2,
+                                            // borderColor);
+                                            // GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness,
+                                            // borderColor);
+                                            // GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness *
+                                            // 2, borderColor);
 
                                             int topShadowColor = 0xff101010;
                                             int topShadowColorTransparent = 0x10101010;
@@ -378,19 +573,58 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                                             int leftShadowColorInner = 0xff201a1a;
                                             int leftShadowColorTransparentInner = 0x10201a1a;
 
-                                            //Outer shadow
-                                            GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, -thickness, width + thickness * 0.4f, thickness, topShadowColorTransparent, topShadowColor);
-                                            GuiDraw.drawHorizontalGradientRect(width, -thickness * 0.2f, thickness, height + thickness * 0.4f, rightShadowColor, rightShadowColorTransparent);
-//                                            GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness, bottomShadowColor, bottomShadowColorTransparent);
-                                            GuiDraw.drawHorizontalGradientRect(-thickness, -thickness * 0.2f, thickness, height + thickness * 0.4f, leftShadowColorTransparent, leftShadowColor);
+                                            // Outer shadow
+                                            GuiDraw.drawVerticalGradientRect(
+                                                -thickness * 0.2f,
+                                                -thickness,
+                                                width + thickness * 0.4f,
+                                                thickness,
+                                                topShadowColorTransparent,
+                                                topShadowColor);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                width,
+                                                -thickness * 0.2f,
+                                                thickness,
+                                                height + thickness * 0.4f,
+                                                rightShadowColor,
+                                                rightShadowColorTransparent);
+                                            // GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width +
+                                            // thickness * 0.4f, thickness, bottomShadowColor,
+                                            // bottomShadowColorTransparent);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                -thickness,
+                                                -thickness * 0.2f,
+                                                thickness,
+                                                height + thickness * 0.4f,
+                                                leftShadowColorTransparent,
+                                                leftShadowColor);
 
-                                            //Inner shadow
-                                            GuiDraw.drawVerticalGradientRect(0, 0, width, thickness, topShadowColorInner, topShadowColorTransparentInner);
-                                            GuiDraw.drawHorizontalGradientRect(width - thickness, 0, thickness, height + 2, rightShadowColorTransparentInner, rightShadowColorInner);
-//                                            GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness, bottomShadowColorTransparentInner, bottomShadowColorInner);
-                                            GuiDraw.drawHorizontalGradientRect(0, 0, thickness, height + 2, leftShadowColorInner, leftShadowColorTransparentInner);
+                                            // Inner shadow
+                                            GuiDraw.drawVerticalGradientRect(
+                                                0,
+                                                0,
+                                                width,
+                                                thickness,
+                                                topShadowColorInner,
+                                                topShadowColorTransparentInner);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                width - thickness,
+                                                0,
+                                                thickness,
+                                                height + 2,
+                                                rightShadowColorTransparentInner,
+                                                rightShadowColorInner);
+                                            // GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness,
+                                            // bottomShadowColorTransparentInner, bottomShadowColorInner);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                0,
+                                                0,
+                                                thickness,
+                                                height + 2,
+                                                leftShadowColorInner,
+                                                leftShadowColorTransparentInner);
                                         });
-//                                    tabButtons.get(i).marginTop(2);
+                                    // tabButtons.get(i).marginTop(2);
                                     tabTitle = tabTitles.get(i);
                                 } else {
                                     tabPanels.get(i)
@@ -399,14 +633,18 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                                         .background((context, x, y, width, height, widgetTheme) -> {
                                             GuiDraw.drawRect(0, 0, width, height, 0xff6e6e6e);
 
-//                int borderColor = 0xff313031;
+                                            // int borderColor = 0xff313031;
                                             float thickness = 1.2f;
 
-//                //Border
-//                GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
-//                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
+                                            // //Border
+                                            // GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2,
+                                            // thickness, borderColor);
+                                            // GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2,
+                                            // borderColor);
+                                            // GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness,
+                                            // borderColor);
+                                            // GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness *
+                                            // 2, borderColor);
 
                                             int topShadowColor = 0xff101010;
                                             int topShadowColorTransparent = 0x10101010;
@@ -426,19 +664,67 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                                             int leftShadowColorInner = 0xff201a1a;
                                             int leftShadowColorTransparentInner = 0x10201a1a;
 
-                                            //Outer shadow
-                                            GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, -thickness, width + thickness * 0.4f, thickness, topShadowColorTransparent, topShadowColor);
-                                            GuiDraw.drawHorizontalGradientRect(width, -thickness * 0.2f, thickness, height + thickness * 0.4f, rightShadowColor, rightShadowColorTransparent);
-                                            GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness * 0.5f, bottomShadowColor, bottomShadowColorTransparent);
-                                            GuiDraw.drawHorizontalGradientRect(-thickness, -thickness * 0.2f, thickness, height + thickness * 0.4f, leftShadowColorTransparent, leftShadowColor);
+                                            // Outer shadow
+                                            GuiDraw.drawVerticalGradientRect(
+                                                -thickness * 0.2f,
+                                                -thickness,
+                                                width + thickness * 0.4f,
+                                                thickness,
+                                                topShadowColorTransparent,
+                                                topShadowColor);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                width,
+                                                -thickness * 0.2f,
+                                                thickness,
+                                                height + thickness * 0.4f,
+                                                rightShadowColor,
+                                                rightShadowColorTransparent);
+                                            GuiDraw.drawVerticalGradientRect(
+                                                -thickness * 0.2f,
+                                                height,
+                                                width + thickness * 0.4f,
+                                                thickness * 0.5f,
+                                                bottomShadowColor,
+                                                bottomShadowColorTransparent);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                -thickness,
+                                                -thickness * 0.2f,
+                                                thickness,
+                                                height + thickness * 0.4f,
+                                                leftShadowColorTransparent,
+                                                leftShadowColor);
 
-                                            //Inner shadow
-                                            GuiDraw.drawVerticalGradientRect(0, 0, width, thickness, topShadowColorInner, topShadowColorTransparentInner);
-                                            GuiDraw.drawHorizontalGradientRect(width - thickness, 0, thickness, height, rightShadowColorTransparentInner, rightShadowColorInner);
-                                            GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness, bottomShadowColorTransparentInner, bottomShadowColorInner);
-                                            GuiDraw.drawHorizontalGradientRect(0, 0, thickness, height, leftShadowColorInner, leftShadowColorTransparentInner);
+                                            // Inner shadow
+                                            GuiDraw.drawVerticalGradientRect(
+                                                0,
+                                                0,
+                                                width,
+                                                thickness,
+                                                topShadowColorInner,
+                                                topShadowColorTransparentInner);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                width - thickness,
+                                                0,
+                                                thickness,
+                                                height,
+                                                rightShadowColorTransparentInner,
+                                                rightShadowColorInner);
+                                            GuiDraw.drawVerticalGradientRect(
+                                                0,
+                                                height - thickness,
+                                                width,
+                                                thickness,
+                                                bottomShadowColorTransparentInner,
+                                                bottomShadowColorInner);
+                                            GuiDraw.drawHorizontalGradientRect(
+                                                0,
+                                                0,
+                                                thickness,
+                                                height,
+                                                leftShadowColorInner,
+                                                leftShadowColorTransparentInner);
                                         });
-//                                    tabButtons.get(i).marginTop(0);
+                                    // tabButtons.get(i).marginTop(0);
                                 }
                             }
                             return true;
@@ -461,8 +747,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 }
 
                 tab.child(
-                    new TextWidget<>(milestone.substring(1))
-                        .style(EnumChatFormatting.WHITE)
+                    new TextWidget<>(milestone.substring(1)).style(EnumChatFormatting.WHITE)
                         .height(20)
                         .fullWidth()
                         .textAlign(Alignment.BottomLeft)
@@ -471,51 +756,47 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 // .pos(columnOffset + sectionTitleOffsetX, rowIndex * rowHeight + rowOffset + sectionTitleOffsetY)
                 );
             } else {
-                String[] parts = milestone.split(":");
-                String modid = parts[0];
-                String name = parts[1];
-                int meta = parts.length > 2 ? Integer.parseInt(parts[2]) : 0;
-
-                Item item = GameRegistry.findItem(modid, name);
-                if (item == null){
-                    continue;
+                FluidStack fluidStack = null;
+                ItemStack itemStack = Milestones.milestonesIdToItemStack.get(milestone);
+                if (itemStack == null) {
+                    fluidStack = Milestones.milestonesIdToFluidStack.get(milestone);
+                    if (fluidStack == null) {
+                        continue;
+                    }
                 }
-                ItemStack stack = new ItemStack(item, 1, meta);
 
                 String timeText = EnumChatFormatting.GRAY + "Incomplete";
                 if (guiData.completedMilestones != null && guiData.completedMilestones.hasKey(milestone)) {
                     timeText = EnumChatFormatting.GREEN + getTimeString(guiData.completedMilestones.getLong(milestone));
                 }
 
-                if (!sectionTitlePresent){
+                if (!sectionTitlePresent) {
                     tab.child(
-                        new Widget<>()
-                            .height(10)
-                            .fullWidth()
-                    );
+                        new Widget<>().height(10)
+                            .fullWidth());
                     sectionTitlePresent = true;
                 }
 
-                row.child(
-                    new ListWidget<>()
-                        // .pos(columnIndex * columnWidth + columnOffset, rowIndex * rowHeight + rowOffset)
-                        .size(milestoneWidth, milestoneHeight)
-//                        .background(GuiTextures.MC_BUTTON)
-                        .child(
-                            new ItemDisplayWidget().item(stack)
-//                                .pos(milestonePadding, milestonePadding)
-                                .posRel(0, 0.5f)
-                                .marginLeft(3)
-                                .addTooltipLine(stack.getDisplayName())
-                                .background(IDrawable.EMPTY)
-                                .hoverBackground(IDrawable.EMPTY))
-                        .child(
-                            new TextWidget<>(timeText)
-                                .textAlign(Alignment.CenterLeft)
-                                .full()
-                                .scale(0.6f)
-                                .marginTop(1)
-                                .marginLeft(textMarginLeft)));
+                if (itemStack == null) {
+                    itemStack = GTUtility.getFluidDisplayStack(fluidStack.getFluid());
+                }
+
+                ListWidget milestoneWidget = new ListWidget<>().size(milestoneWidth, milestoneHeight)
+                    .child(
+                        new ItemDisplayWidget().item(itemStack)
+                            .posRel(0, 0.5f)
+                            .marginLeft(3)
+                            .addTooltipLine(itemStack.getDisplayName())
+                            .background(IDrawable.EMPTY)
+                            .hoverBackground(IDrawable.EMPTY))
+                    .child(
+                        new TextWidget<>(timeText).textAlign(Alignment.CenterLeft)
+                            .full()
+                            .scale(0.6f)
+                            .marginTop(1)
+                            .marginLeft(textMarginLeft));
+
+                row.child(milestoneWidget);
 
                 columnIndex++;
                 if (columnIndex > columnCount - 1) {
@@ -541,14 +822,14 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
             .background((context, x, y, width, height, widgetTheme) -> {
                 GuiDraw.drawRect(0, 0, width, height + 3, 0xff313031);
 
-                //                int borderColor = 0xff313031;
+                // int borderColor = 0xff313031;
                 float thickness = 1.2f;
 
-//                //Border
-//                GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
-//                GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
-//                GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
+                // //Border
+                // GuiDraw.drawRect(-thickness, -thickness, width + thickness * 2, thickness, borderColor);
+                // GuiDraw.drawRect(width, -thickness, thickness, height + thickness * 2, borderColor);
+                // GuiDraw.drawRect(-thickness, height, width + thickness * 2, thickness, borderColor);
+                // GuiDraw.drawRect(-thickness, -thickness, thickness, height + thickness * 2, borderColor);
 
                 int topShadowColor = 0xff101010;
                 int topShadowColorTransparent = 0x10101010;
@@ -568,20 +849,58 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
                 int leftShadowColorInner = 0xff201a1a;
                 int leftShadowColorTransparentInner = 0x10201a1a;
 
-                //Outer shadow
-                GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, -thickness, width + thickness * 0.4f, thickness, topShadowColorTransparent, topShadowColor);
-                GuiDraw.drawHorizontalGradientRect(width, -thickness * 0.2f, thickness, height + thickness * 0.4f, rightShadowColor, rightShadowColorTransparent);
-//                                            GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness, bottomShadowColor, bottomShadowColorTransparent);
-                GuiDraw.drawHorizontalGradientRect(-thickness, -thickness * 0.2f, thickness, height + thickness * 0.4f, leftShadowColorTransparent, leftShadowColor);
+                // Outer shadow
+                GuiDraw.drawVerticalGradientRect(
+                    -thickness * 0.2f,
+                    -thickness,
+                    width + thickness * 0.4f,
+                    thickness,
+                    topShadowColorTransparent,
+                    topShadowColor);
+                GuiDraw.drawHorizontalGradientRect(
+                    width,
+                    -thickness * 0.2f,
+                    thickness,
+                    height + thickness * 0.4f,
+                    rightShadowColor,
+                    rightShadowColorTransparent);
+                // GuiDraw.drawVerticalGradientRect(-thickness * 0.2f, height, width + thickness * 0.4f, thickness,
+                // bottomShadowColor, bottomShadowColorTransparent);
+                GuiDraw.drawHorizontalGradientRect(
+                    -thickness,
+                    -thickness * 0.2f,
+                    thickness,
+                    height + thickness * 0.4f,
+                    leftShadowColorTransparent,
+                    leftShadowColor);
 
-                //Inner shadow
-                GuiDraw.drawVerticalGradientRect(0, 0, width, thickness, topShadowColorInner, topShadowColorTransparentInner);
-                GuiDraw.drawHorizontalGradientRect(width - thickness, 0, thickness, height + 2, rightShadowColorTransparentInner, rightShadowColorInner);
-//                                            GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness, bottomShadowColorTransparentInner, bottomShadowColorInner);
-                GuiDraw.drawHorizontalGradientRect(0, 0, thickness, height + 2, leftShadowColorInner, leftShadowColorTransparentInner);
+                // Inner shadow
+                GuiDraw.drawVerticalGradientRect(
+                    0,
+                    0,
+                    width,
+                    thickness,
+                    topShadowColorInner,
+                    topShadowColorTransparentInner);
+                GuiDraw.drawHorizontalGradientRect(
+                    width - thickness,
+                    0,
+                    thickness,
+                    height + 2,
+                    rightShadowColorTransparentInner,
+                    rightShadowColorInner);
+                // GuiDraw.drawVerticalGradientRect(0, height - thickness, width, thickness,
+                // bottomShadowColorTransparentInner, bottomShadowColorInner);
+                GuiDraw.drawHorizontalGradientRect(
+                    0,
+                    0,
+                    thickness,
+                    height + 2,
+                    leftShadowColorInner,
+                    leftShadowColorTransparentInner);
             });
-//        tabButtons.get(0)
-//            .marginTop(2);
+        // tabButtons.get(0)
+        // .marginTop(2);
         tabTitle = tabTitles.get(0);
 
         panel.child(tabGrid);
@@ -590,8 +909,7 @@ public class GUIFactoryMilestones implements UIFactory<GUIDataMilestones> {
     }
 
     private Grid createRow() {
-        return new Grid()
-            .size((milestoneWidth + milestoneGap) * columnCount - milestoneGap, milestoneHeight)
+        return new Grid().size((milestoneWidth + milestoneGap) * columnCount - milestoneGap, milestoneHeight)
             .minElementMargin(milestoneGap / 2);
     }
 

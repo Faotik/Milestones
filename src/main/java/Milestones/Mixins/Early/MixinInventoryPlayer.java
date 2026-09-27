@@ -22,14 +22,14 @@ public abstract class MixinInventoryPlayer {
     @Inject(method = "addItemStackToInventory", at = @At("HEAD"))
     private void addItemStackToInventory(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (!player.worldObj.isRemote) {
-            Common.checkItem(player.getUniqueID(), stack);
+            Common.checkMilestone(player.getUniqueID(), stack);
         }
     }
 
     @Inject(method = "setInventorySlotContents", at = @At("HEAD"))
     private void setInventorySlotContents(int slot, ItemStack stack, CallbackInfo ci) {
         if (!player.worldObj.isRemote) {
-            Common.checkItem(player.getUniqueID(), stack);
+            Common.checkMilestone(player.getUniqueID(), stack);
         }
     }
 }

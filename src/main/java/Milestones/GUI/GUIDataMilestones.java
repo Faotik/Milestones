@@ -1,13 +1,14 @@
 package Milestones.GUI;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
 import com.cleanroommc.modularui.factory.GuiData;
 
 import Milestones.Configs.ConfigMilestones;
-
-import java.util.*;
 
 public class GUIDataMilestones extends GuiData {
 
@@ -34,7 +35,7 @@ public class GUIDataMilestones extends GuiData {
         return persistedData.getCompoundTag("CompletedMilestones");
     }
 
-    private String[] parseConfig(){
+    private String[] parseConfig() {
         List<String> result = new ArrayList<>();
 
         for (String entry : ConfigMilestones.items) {

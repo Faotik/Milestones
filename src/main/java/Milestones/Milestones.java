@@ -1,8 +1,14 @@
 package Milestones;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +22,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
-@Mod(modid = Milestones.MODID, version = Tags.VERSION, name = Milestones.MODNAME, acceptedMinecraftVersions = "[1.7.10]")
+@Mod(
+    modid = Milestones.MODID,
+    version = Tags.VERSION,
+    name = Milestones.MODNAME,
+    acceptedMinecraftVersions = "[1.7.10]")
 public class Milestones {
 
     public static final String MODID = "milestones";
@@ -27,7 +37,9 @@ public class Milestones {
     public static SimpleNetworkWrapper network;
     public static Block trophyBlock = new TrophyBlockContainer();
 
-    public static Set<String> milestonesList;
+    public static Set<String> milestonesId = new HashSet<>();
+    public static Map<String, ItemStack> milestonesIdToItemStack = new HashMap<>();
+    public static Map<String, FluidStack> milestonesIdToFluidStack = new HashMap<>();
     public static final Map<UUID, Set<String>> completedMilestonesCache = new HashMap<>();
 
     @SidedProxy(clientSide = "Milestones.ClientProxy", serverSide = "Milestones.CommonProxy")
