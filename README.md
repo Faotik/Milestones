@@ -1,6 +1,6 @@
 # Milestones
 
-**Milestones** is a Minecraft 1.7.10 Forge mod that tracks configurable item and fluid milestones and records when players obtain or produce them.
+**Milestones** is a Minecraft 1.7.10 Forge mod that tracks configurable item and fluid milestones and records when players obtain them.
 
 When a milestone is completed, the player receives a notification containing the milestone and their current playtime. Depending on configuration, the mod can also spawn a trophy representing the milestone and launch a firework celebration.
 
